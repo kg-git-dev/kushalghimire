@@ -4,12 +4,12 @@ import { Grid, Header, Segment, Form, Button } from 'semantic-ui-react';
 class Indicator extends Component {
 
   render() {
-
+    const { deviceType } = this.props;
     const { currentStep: { currentStep } } = this.props;
 
     return (
       <div>
-        <div className="ui tablet stackable fluid tiny steps">
+        {deviceType == 'desktop' ? <div className="ui tablet fluid tiny steps">
           <div className={`${this.props.currentStep === 'first' ? 'active' : 'disabled'} step`}>
             <i className="handshake icon"></i>
             <div className="content">
@@ -31,7 +31,8 @@ class Indicator extends Component {
               <div className="description">Finance your dream car at KG Motors</div>
             </div>
           </div>
-        </div>
+        </div> : ''}
+
       </div>
     );
   }

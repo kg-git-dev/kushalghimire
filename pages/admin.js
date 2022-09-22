@@ -9,11 +9,13 @@ class Admin extends Component {
 
     const campaigns = await compileDonation.methods.owner().call();
     const subscriberDetails = await compileDonation.methods.getSubscribersDetails().call();
+    const firstSubscriber = await compileDonation.methods.subscribers(0).call();
 
     return {
       balance: web3.utils.fromWei(subscriberDetails[0], "ether"),
       subscriberCount: subscriberDetails[1],
-      campaigns
+      campaigns,
+      firstSubscriber
     };
   }
 
@@ -49,14 +51,17 @@ class Admin extends Component {
     const {
       campaigns,
       balance,
-      subscriberCount
+      subscriberCount,
+      firstSubscriber
+      
     } = this.props;
     return (
       <div>
         <div>
           Owner: {campaigns}<br />
           Total Balance: {balance}<br />
-          subscriberCount: {subscriberCount}
+          subscriberCount: {subscriberCount}<br/>
+          Subscriber Detail: {firstSubscriber}
         </div>
         <div>
           <Form>

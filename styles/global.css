@@ -214,3 +214,18 @@
 .controls ul li.active {
   background:#6a6a77;;
 }
+
+
+
+
+
+
+.ui.statistic>.value, .ui.statistics .statistic>.value {
+  font-size: 2.8rem!important;
+}
+
+
+
+.makePaymentButton{
+  text-align: right;
+}

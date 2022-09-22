@@ -6,6 +6,8 @@ class BlueMonkeyVapes extends Component {
 
 
   render() {
+    const { deviceType } = this.props;
+
 
     return (
       <div>
@@ -24,7 +26,7 @@ class BlueMonkeyVapes extends Component {
                   In 2019, the vaping industry was taken over by a storm as there were reports of <a href="https://www.cdc.gov/tobacco/basic_information/e-cigarettes/severe-lung-disease.html">outbreak of lung injuries</a> induced via vaping. 
                   <br />The backlash was fierce. Although, the outbreak was caused by use of modified marijuana cartidges, the details seldom matter in cases of public outrage. Eventually, Blue Monkey Vapes suffered major losses and shut down multiple locations. A fate shared by other businesses in the vaping industry. 
                   <div class="ui grid">
-                    <div class="eleven wide column">
+                  <div class={`${deviceType == 'desktop' ? 'eleven':'nine'} wide column`}>
                     <br /><b>One Lesson:</b>
                     <br /> - The statement "There is no such thing as a bad publicity" is arguably incorrect. 
                     <br /><br /><b>Many Responsbilities:</b>
@@ -34,14 +36,15 @@ class BlueMonkeyVapes extends Component {
                     <br />- Managed company's retail headquarters.
                     <br />- Consistently exceeded goals in key metrics, such as sales, profit, and customer service.
                     <br />- Hired, scheduled, trained and coached junior sales associates.
-                    <br/><br />
-                    <div className="extra images">
+                    <br/><br/>
+                    {deviceType == 'desktop' ? <div className="extra images">
                     <Image src="bmv_store.png" />
                     <Image src="bmv_slogan.png" />
-                  </div>
+                  </div> : ''}
+
                     </div>
                     
-                    <div class="five wide column">
+                    <div class={`${deviceType == 'desktop' ? 'five':'seven'} wide column`}>
                       <br />
                       <div class="ui vertical fluid mini steps">
                         <div class="step">
@@ -82,8 +85,15 @@ class BlueMonkeyVapes extends Component {
                         </div>
                       </div>
                     </div>
+      
                   </div>
+ 
                 </div>
+                {deviceType == 'mobile' ? <div className="extra images">
+                    <Image src="bmv_store.png" />
+                    <Image src="bmv_slogan.png" />
+                  </div> : ''}
+                
               </div>
             </div>
           </div>  

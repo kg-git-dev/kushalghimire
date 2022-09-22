@@ -6,6 +6,10 @@ import 'react-slideshow-image/dist/styles.css';
 
 
 class CyberTruck extends Component {
+    state = {
+        activated: false,
+    }
+
     componentDidMount() {
         const items = document.querySelectorAll('.item-custom-created'),
             controls = document.querySelectorAll('.control'),
@@ -76,6 +80,11 @@ class CyberTruck extends Component {
 
         let intervalF = setInterval(slider.nextSlide, interval);
         slider.init();
+    }
+
+    initializeContract = (e) => {
+        this.props.saveAndContinue();
+        this.setState({activated: true})
     }
 
     render() {
@@ -212,7 +221,7 @@ class CyberTruck extends Component {
                                     </div>
 
                                     <div class="item-description">
-                                       
+
 
                                         <span class="vertical-part">
                                             <b>Fully&nbsp;</b>
@@ -240,7 +249,7 @@ class CyberTruck extends Component {
                                 </div>
                             </div>
                             <div class="buy-now-button">
-                                <Button positive icon labelPosition='right'><Icon name='right arrow'/>let-me-get-it-now</Button>
+                                <Button className='' onClick={this.initializeContract} disabled={this.state.activated} positive icon labelPosition='right'><Icon name='right arrow' />let-me-get-it-now</Button>
                             </div>
                             <div class="controls">
                                 <ul>

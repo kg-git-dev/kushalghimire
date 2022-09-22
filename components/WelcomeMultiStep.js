@@ -32,6 +32,7 @@ class WelcomeMultiStep extends React.Component {
   }
    
   render() {
+    const { deviceType } = this.props;
     const { step } = this.state;
     const {subscriberName, subscriberIp, subscriberCountry} = this.state;
     const values = {subscriberName, subscriberIp, subscriberCountry};
@@ -41,13 +42,15 @@ class WelcomeMultiStep extends React.Component {
         return (
           <div>
             <Indicator 
-              currentStep="first"/>
+              currentStep="first"
+              deviceType={deviceType}/>
               <br/>
             <FirstStep
                   nextStep={this.nextStep} 
                   handleChange = {this.handleChange}
                   setSubscriberIp={this.setSubscriberIp}  
-                  values={values}                           
+                  values={values} 
+                  deviceType={deviceType}                          
                 />
         </div>
       );

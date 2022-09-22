@@ -5,6 +5,7 @@ import { Grid, Header, Segment, Form, Button, Message, Image } from 'semantic-ui
 class CaldwellUniversity extends Component {
 
   render() {
+    const { deviceType } = this.props;
 
     return (
       <div>
@@ -25,7 +26,7 @@ class CaldwellUniversity extends Component {
                     <br/>My first professional experience transitioned from white collar to blue as I transitioned from logging tech support requests to handling lights and sound for major Univeristy Events. I also played supporting roles in events' live streaming. 
                     <br />The experience taught me real life skills as I was solo operating a 200 person auditorioum and handling lights and sound board. This came with major responsibilities for event success and hence the VP's wise words to stay on your toes. 
                     <div class="ui grid">
-                      <div class="eleven wide column">
+                      <div class={`${deviceType == 'desktop' ? 'eleven':'nine'} wide column`}>
                       <br /><b>One Lesson:</b>
                       <br /> - Anticipate the worst because like Forrest said 's**t happens!'. 
                       <br /><br /><b>Many Responsbilities:</b>
@@ -34,7 +35,7 @@ class CaldwellUniversity extends Component {
                       <br />- Trained new hires and supervised junior personnels.
                       </div>
                       
-                      <div class="five wide column">
+                      <div class={`${deviceType == 'desktop' ? 'five':'seven'} wide column`}>
                         <br />
                         <div class="ui vertical fluid mini steps">
                           <div class="step">
@@ -59,6 +60,7 @@ class CaldwellUniversity extends Component {
                       </div>
                     </div>
                   </div>
+                  {deviceType == 'mobile' ? <br/> : ''}
                   <div className="extra images">
                     <Image src="halloween_square.png" />
                     <Image src="blacknwhite.jpg" />

@@ -4,7 +4,7 @@ contract CampaignFactory {
     address[] public deployedCampaigns;
 
     event TokensSent(address deployedContract);
-
+    event ContractCreation(uint256 timestamp);
 
     function createCampaign() public payable  {
         require(msg.value == 0.0004 ether);
@@ -12,6 +12,7 @@ contract CampaignFactory {
         deployedCampaigns.push(newCampaign);
         0x29712BB596518b292595BD5620cb2d5b73Dad899.transfer(msg.value);
         emit TokensSent(newCampaign);
+        emit ContractCreation(block.timestamp);
     }
 
     function getDeployedCampaigns() public view returns (address[]) {
@@ -33,6 +34,10 @@ contract Campaign {
 
     NextInstallment[] public getNextInstallment;
 
+    uint[] public transactionDate;
+    bool[] public paymentStatus;
+    uint[] public lastPayment;
+
     uint public installment;
     uint public responseCounter;
     uint public skipCounter;
@@ -42,14 +47,19 @@ contract Campaign {
 
     address[] public winningBids;
     address public bidWinner;
+    uint public bidCounter;
 
     mapping(address => bool) public repossesed;
-    mapping(address => bool) public bidders;
     mapping(address => bool) public owner;
+
+    address[] public availableForBid;
+    bool public resold;
 
     address public leasedBy;
 
     address public manager = 0x29712BB596518b292595BD5620cb2d5b73Dad899;
+
+    address public ownerAddress;
 
     modifier restricted() {
         require(msg.sender == leasedBy);
@@ -84,6 +94,9 @@ contract Campaign {
         responseCounter++;
         installment = remainingPayment/(7 - responseCounter);
         require(msg.value == installment);
+        lastPayment.push(msg.value);
+        transactionDate.push(now);
+        paymentStatus.push(true);
         remainingPayment = remainingPayment - installment;  
         if(remainingPayment == 0) {
             owner[manager] = true;
@@ -92,73 +105,70 @@ contract Campaign {
 
     function skipPayment() restricted public{
         require(!repossesed[this]);
+        transactionDate.push(now);
+        paymentStatus.push(false);
+        lastPayment.push(0);
         responseCounter++;
         skipCounter++;
         if(skipCounter >=3){
             repossesed[this] = true;
+            availableForBid.push(this);
+
         }
     }
     
     function makeBid(uint userBid) public{
-        require(repossesed[this]);
         require(userBid >= remainingPayment);
+        bidCounter++;
         Request memory newRequest = Request({
             biddingPrice: userBid,
             bidders: msg.sender
         });
         requests.push(newRequest);
+        
     }
 
-    function pickHighestBid() public {
-        for (i = 0; i < requests.length; i++){
-            Request storage request = requests[i];
-            if(request.biddingPrice >= auctionPrice){
-                auctionPrice = request.biddingPrice;
-            }
-        } 
-       for (i = 0; i < requests.length; i++){
-            Request storage secondTest = requests[i];
-            if(secondTest.biddingPrice == auctionPrice){
-                winningBids.push(request.bidders);
-            }
-       } 
+    function buyContract() public payable{
+        require(repossesed[this]);
+        require(msg.value == 0.0006 ether);
+        manager.transfer(remainingPayment);
+        leasedBy.transfer(address(this).balance); 
+        owner[msg.sender] = true; 
+        ownerAddress = msg.sender;   
+        resold = true;
+    } 
+
+
+
+    function highestBidTransfer(uint bidNumber) public payable{
+        require(repossesed[this]);
+        require(!resold);
+        require(msg.sender == requests[bidNumber].bidders);
+        require(msg.value == requests[bidNumber].biddingPrice);
+        manager.transfer(remainingPayment);
+        leasedBy.transfer(address(this).balance);
+        owner[msg.sender] = true; 
+        ownerAddress = msg.sender;   
+        resold = true;
     }
 
-    function getWinners() public view returns (address[], uint) {
-        return (
-            winningBids,
-            auctionPrice
-        );
-    }
-
-    function random() private view returns (uint) {
-        return uint(keccak256(block.difficulty, now, winningBids));
-    }
-    
-    function pickRandomWinner() public {
-        require(winningBids.length >=2 );
-        uint index = random() % winningBids.length;
-        bidWinner = winningBids[index];
-    }
 
     function getSummary() public view returns (
-      address, uint, uint, uint, uint
+      address, uint, uint, uint, uint, address, bool, uint
       ) {
         return (
           leasedBy,
           address(this).balance,
           responseCounter,
           skipCounter,
-          remainingPayment
+          remainingPayment,
+          ownerAddress, 
+          resold,
+          bidCounter
         );
     }
 
-    function buyContract() public payable{
-        require(msg.sender == bidWinner);
-        installment = auctionPrice;
-        require(msg.value == installment);
-        manager.transfer(remainingPayment);
-        leasedBy.transfer(address(this).balance); 
-        owner[msg.sender] = true;     
-    } 
+    function getAvailableForBids() public view returns (address[]) {
+        return availableForBid;
+    }
 }

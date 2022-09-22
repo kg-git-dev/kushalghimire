@@ -17,7 +17,7 @@ class ContributeForm extends Component {
     const campaign = Campaign(this.props.address);
 
     const nextPayment = await campaign.methods.getNextInstallment().call();
-    console.log(nextPayment);
+    // console.log(nextPayment);
 
     this.setState({ loading: true, errorMessage: "" });
 

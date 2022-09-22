@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Header, Segment, Button, List, Form, Message } from 'semantic-ui-react';
+import { Grid, Header, Segment, Button, List, Form, Message, Icon } from 'semantic-ui-react';
 import factory from "../../ethereum/factory";
 import web3 from "../../ethereum/web3";
 import { Router } from '../../routes';
@@ -8,13 +8,14 @@ import CyberTruck from '../CyberTruck';
 class ThirdStep extends Component {
 
   state = {
-    errorMessage: "",
     loading: false,
-    contractAddress: ""
+    contractAddress: "0x57c24f86A28aac39B77B5c385eF072985190fBe0"
   };
 
-  saveAndContinue = async (e) => {
-    e.preventDefault();
+  saveAndContinue = async () => {
+
+    this.setState({ loading: true })
+
     this.setState({ loading: true, errorMessage: "" });
 
     try {
@@ -26,21 +27,16 @@ class ThirdStep extends Component {
       });
 
       const deployedAddress = deployedContract.events.TokensSent.returnValues['deployedContract'];
+      const deployedTime = deployedContract.events.ContractCreation.returnValues['timestamp'];
+      console.log(deployedTime);
 
       this.setState({ contractAddress: deployedAddress });
     } catch (err) {
       this.setState({ errorMessage: err.message });
     }
-    // console.log(this.state.contractAddress);
+    console.log(this.state.contractAddress);
+    this.setState({ loading: false });
     Router.pushRoute(`/campaigns/${this.state.contractAddress}`);
-    Router.pushRoute(`/`);
-
-
-
-    // console.log(contractAddress);
-    // this.setState({ loading: false });
-
-
   };
 
 
@@ -54,35 +50,22 @@ class ThirdStep extends Component {
 
     return (
       <div>
-        <CyberTruck />
+        <div>
+          <CyberTruck
+            saveAndContinue={this.saveAndContinue} />
+        </div>
+        <div>
+          {this.state.loading ? <Message icon>
+            <Icon name='circle notched' loading />
+            <Message.Content>
+              <Message.Header>While this might take 20 seconds. Let's examine what's happening.</Message.Header>
+              A contract is being created that automatically accepts installment payments, recalculates and recalibrates installment schedules, and finally automatically reposesses and redistributes the ownership of a physical car.  
+            </Message.Content>
+          </Message> : ''}
+        </div>
       </div>
-      // <div>
-      //   <Grid.Column style={{ maxWidth: 600 }}>
-      //     <Header textAlign='center'>
-      //       <h1>Confirm your Details</h1>
-
-      //       <p>Click Confirm if the following details have been correctly entered</p>
-      //     </Header>
-      //     <Segment>
-
-      //       <h3>Create Campaign</h3>
-      //       <Form onSubmit={this.saveAndContinue} error={!!this.state.errorMessage}>
-      //         <Message error header="Oops!" content={this.state.errorMessage} />
-      //         <Button loading={this.state.loading} primary>
-      //           Create!
-      //         </Button>
-      //       </Form>
-
-      //     </Segment>
-
-      //     {/* <Segment textAlign='center'>
-      //     <Button onClick={this.back}>Back</Button>
- 
-      //     <Button onClick={this.saveAndContinue}>Confirm</Button>
-      //   </Segment> */}
-      //   </Grid.Column>
-      // </div>
     )
+
   }
 }
 

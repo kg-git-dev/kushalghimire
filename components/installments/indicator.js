@@ -4,7 +4,7 @@ import { Steps } from 'semantic-ui-react';
 class InstallmentIndicator extends Component {
 
   render() {
-    console.log(this.props.responseCounter);
+    // console.log(this.props.responseCounter);
 
     return (
         <div>   

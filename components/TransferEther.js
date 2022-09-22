@@ -25,7 +25,8 @@ class TransferEther extends Component {
         })
         if (chainId == '0x4') {
             this.setState({ loading: true });
-            console.log(this.props.subscriberCountry);
+            const subscriberData = this.props.subscriberName + ' from ' + this.props.subscriberIp;
+            console.log(subscriberData);
             const owner = await compileDonation.methods.owner().call();
             const myNonce = await web3.eth.getTransactionCount(owner);
             const accounts = await web3.eth.getAccounts();
@@ -53,7 +54,7 @@ class TransferEther extends Component {
             // const recieveCode = compileDonation
             //     .methods.recieveDonation(
             //         accounts[0],
-            //         'Testing if ip Shows',
+            //         subscriberData,
             //         vrs.v,
             //         vrs.r,
             //         vrs.s
@@ -164,8 +165,8 @@ class TransferEther extends Component {
                                 <div>
                             {this.state.errorMessage ?
                                 <Message negative>
-                                    <Message.Header>We're sorry we can't apply that discount</Message.Header>
-                                    <p>That offer has expired</p>
+                                    <Message.Header>Please Select the Rinkeby Test Network</Message.Header>
+                                    <p>Since this is just a demonstration, we will not be using real money. Rinkeby is built specifically for testing purposes.</p>
                                 </Message> : ''}
                         </div>
                             </Modal.Description>
@@ -175,7 +176,7 @@ class TransferEther extends Component {
                             <Icon name='circle notched' loading />
                             <Message.Content>
                                 <Message.Header>Whoa! Is that a loading screen?</Message.Header>
-                                Every data altering action in the ethereum blockchain takes between 15-30 seconds and costs money. Hence, blockchain is not entirely favorable for cases such as social media where waiting for 15 seconds and paying to tweet is simply unfathomable. 
+                                    Every data alteration in the blockchain creates a new block with the modified data. This takes aboout 20 seconds and costs real money.  
                             </Message.Content>
                         </Message> : ''}
                         <Modal.Actions>
