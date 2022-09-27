@@ -14,7 +14,7 @@ class WebPointSolutions extends Component {
             <div className="event">
               <div className="content">
                 <div className="date">
-                  <div style={{color: 'blue'}}><b>February 2021 - July 2021, Head of Digital Marketing.</b></div>
+                  <div style={{color: 'blue'}}><b>February 2021 - July 2022, Head of Digital Marketing.</b></div>
                 </div>
                 <div className="summary">
                   Webpoint and the Great Pivot. 

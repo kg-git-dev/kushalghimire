@@ -1,50 +1,114 @@
 import React, { Component } from "react";
-import { Card, Button } from "semantic-ui-react";
-import factory from "../ethereum/factory";
 import Layout from "../components/Layout";
-import { Link } from "../routes";
-import InstallmentIndicator from "../components/installments/indicator";
+import { Grid } from 'semantic-ui-react';
+import WelcomeMultiStep from "../components/WelcomeMultiStep";
+import { Helmet } from 'react-helmet';
 
-class CampaignIndex extends Component {
-  static async getInitialProps() {
-    const campaigns = await factory.methods.getDeployedCampaigns().call();
 
-    return { campaigns };
+class HomePage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { step: 'Desktop' };
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
-  renderCampaigns() {
-    const items = this.props.campaigns.map((address) => {
-      return {
-        header: address,
-        description: (
-          <Link route={`/campaigns/${address}`}>
-            <a>View Campaign</a>
-          </Link>
-        ),
-        fluid: true,
-      };
-    });
-    return <Card.Group items={items} />;
+  componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
+  }
+
+  updateWindowDimensions() {
+    if (window.innerWidth >= 768) {
+      this.setState({ step: 'Desktop' })
+    } else {
+      this.setState({ step: 'Mobile' })
+    }
+  }
+
   render() {
-    return (
-      <Layout>
-        <div>
-          <h3>Open Campaigns</h3>
-          <Link route="/campaigns/new">
-            <a>
-              <Button
-                floated="right"
-                content="Create Campaign"
-                icon="add circle"
-                primary
+    const { step } = this.state;
+
+
+    switch (step) {
+      case 'Desktop':
+        return (
+          <>
+            <Helmet>
+              <title>Kushal Ghimire - Web SEO and Technical Marketing</title>
+              <meta
+                name="description"
+                content="Welcome to kushalghimire.com. Learn more about me or try a web3 demonstration."
               />
-            </a>
-          </Link>
-          {this.renderCampaigns()}
-        </div>
-      </Layout>
-    );
+              <meta name="og-title" content="kushalghimire.com" />
+              <meta name="og-description" content="Welcome to kushalghimire.com" />
+              <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
+            </Helmet>
+            <Layout>
+              <div>
+                <Grid>
+                  <Grid.Row>
+                    <Grid.Column width={2}>
+                    </Grid.Column>
+                    <Grid.Column width={12}>
+                      <br /><br /><br />
+                      <WelcomeMultiStep deviceType="desktop" />
+                      <br /><br />
+                    </Grid.Column>
+                    <Grid.Column width={2}>
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </div>
+            </Layout>
+          </>
+        );
+
+      case 'Mobile':
+        return (
+          <>
+            <Helmet>
+              <title>Kushal Ghimire - Web SEO and Technical Marketing</title>
+              <meta
+                name="description"
+                content="Welcome to kushalghimire.com. Learn more about me or try a web3 demonstration."
+              />
+              <meta name="og-title" content="kushalghimire.com" />
+              <meta name="og-description" content="Welcome to kushalghimire.com" />
+              <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
+            </Helmet>
+            <Layout>
+              <div>
+                <Grid>
+                  <Grid.Row>
+                    <Grid.Column>
+                      <WelcomeMultiStep deviceType="mobile" />
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </div>
+            </Layout>
+          </>
+        );
+      default:
+        return (
+          <>
+            <Helmet>
+              <title>Kushal Ghimire - Web SEO and Technical Marketing</title>
+              <meta
+                name="description"
+                content="Welcome to kushalghimire.com. Learn more about me or try a web3 demonstration."
+              />
+              <meta name="og-title" content="kushalghimire.com" />
+              <meta name="og-description" content="Welcome to kushalghimire.com" />
+              <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
+            </Helmet>
+          </>
+        );
+    }
   }
 }
 
-export default CampaignIndex;
+export default HomePage;
