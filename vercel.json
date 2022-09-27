@@ -1,5 +1,20 @@
 {
-    "rewrites":  [
-      {"source": "/(.*)", "destination": "/"}
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/"
+        },
+        {
+            "source": "/auctions",
+            "destination": "/auctions/auctionList"
+        },
+        {
+            "source": "auctions/:address",
+            "destination": "/auctions/show"
+        },
+        {
+            "source": "campaigns/:address",
+            "destination": "/campaigns/show"
+        }
     ]
-  }
+}
