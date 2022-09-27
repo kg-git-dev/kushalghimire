@@ -24,7 +24,7 @@ class CaldwellUniversity extends Component {
                   <div className="extra text">
                     The VP of Technology at Caldwell University on his first intro asked if I had ever heard of Murphy's Law. I had, in fact, not.
                     <br/>My first professional experience transitioned from white collar to blue as I transitioned from logging tech support requests to handling lights and sound for major Univeristy Events. I also played supporting roles in events' live streaming. 
-                    <br />The experience taught me real life skills as I was solo operating a 200 person auditorioum and handling lights and sound board. This came with major responsibilities for event success and hence the VP's wise words to stay on your toes. 
+                    <br />The experience taught me real life skills as I was solo operating a 200 capacity auditorioum and handling lights and sound board. This came with major responsibilities for events' success and hence the VP's wise words to stay on your toes. 
                     <div class="ui grid">
                       <div class={`${deviceType == 'desktop' ? 'eleven':'nine'} wide column`}>
                       <br /><b>One Lesson:</b>

@@ -136,14 +136,14 @@ class SecondStep extends Component {
             </div>
             <div>
               <h3 class="ui block header">
-                TERMS AND CONDITIONS !
+                TERMS AND CONDITIONS FOR THE DEMONSTRATION!
               </h3>
             </div>
             <div>
               <div>
-                <br/><p>KG Motors is proud to announce our (<i>hypothetical</i>) partnership with Tesla Cyber Truck. As authorized sellers, we are offering a specialized financing package. Make 40% downpayment and pay the rest over a period of 6 months. Hurry up and get yours now!</p>
-                <p>We at KG Motors believe in transparency (<i>and since we are a hypothetical company</i>), I will let you know what is in it for us. Basically, if you miss more than 2 payments, your car will be automatically repossesed sold in an auction. Since, we already have your 40% downpayment, our risk is minimal since, realistically, a card could deprecate upto 40% within 6 months. In case it depreceates more, we have it covered by insurance. Also, web3 lets us do all this automatically, imagine the money we are saving on logistics. </p>
-                <p>Again, since we are an honest and a hypothetical company, any surplus after covering the remaining balance will be automatically returned to you.</p>
+                <br/><p>KG Motors is proud to announce our (<i>hypothetical</i>) partnership with Tesla Cyber Truck. As authorized sellers, we are offering a specialized financing package of 40% downpayment and 4 to 6 even payments.</p>
+                <p>In lieu of transparency, missing more than 2 or the final payment will result in the car being repossesed and sold in auction.</p>
+                <p>Signees are requested to review the terms carefully since the path will be executed exactly as defined in the contract and cannot be altered or intervined with.</p>
                </div>
               <div class="ui list">
                 <div class="item">

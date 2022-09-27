@@ -75,9 +75,10 @@ class HomePage extends Component {
                 name="description"
                 content="Welcome to kushalghimire.com. Learn more about me or try a web3 demonstration."
               />
-              <meta name="og-title" content="kushalghimire.com" />
-              <meta name="og-description" content="Welcome to kushalghimire.com" />
-              <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
+              <meta property='og:title' content='Welcome to kushalghimire.com' />
+              <meta property='og:image' content='https://kushalghimire.vercel.app/kushal_profile_pic.png' />
+              <meta property='og:description' content='Learn more about me or try a web3 demonstration' />
+              <meta property='og:url' content='https://kushalghimire.com/' />
             </Helmet>
             <Layout>
               <div>
