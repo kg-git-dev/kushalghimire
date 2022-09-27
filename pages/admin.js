@@ -21,7 +21,7 @@ class Admin extends Component {
 
   addBalance = async (e) => {
     e.preventDefault();
-    const contractAddress = '0x3D3E3a0767045f4f05CAB6cecA24325F234e3058'
+    const contractAddress = '0x034D906be2eD849De6a31b26F940720bF99d1f35'
     // Configuring the connection to an Ethereum node
     const signer = web3.eth.accounts.privateKeyToAccount(
       '6ffc83620b302d5a4b3c7c28975e984ac298e94b5c7ff5c37c08bf2cf4c8eb63'
@@ -31,7 +31,7 @@ class Admin extends Component {
     const tx = {
       from: signer.address,
       to: contractAddress,
-      value: web3.utils.toWei("0.03"),
+      value: web3.utils.toWei("0.003"),
     };
     // Assigning the right amount of gas
     tx.gas = await web3.eth.estimateGas(tx);
