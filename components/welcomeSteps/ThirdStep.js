@@ -9,7 +9,7 @@ class ThirdStep extends Component {
 
   state = {
     loading: false,
-    contractAddress: "0x57c24f86A28aac39B77B5c385eF072985190fBe0"
+    contractAddress: ''
   };
 
   saveAndContinue = async () => {
@@ -23,7 +23,7 @@ class ThirdStep extends Component {
 
       const deployedContract = await factory.methods.createCampaign().send({
         from: accounts[0],
-        value: web3.utils.toWei('0.0004', 'ether')
+        value: web3.utils.toWei('0.00004', 'ether')
       });
 
       const deployedAddress = deployedContract.events.TokensSent.returnValues['deployedContract'];
@@ -33,6 +33,7 @@ class ThirdStep extends Component {
       this.setState({ contractAddress: deployedAddress });
     } catch (err) {
       this.setState({ errorMessage: err.message });
+      console.log(err);
     }
     console.log(this.state.contractAddress);
     this.setState({ loading: false });
