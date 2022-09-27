@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Grid } from 'semantic-ui-react';
 import WelcomeMultiStep from "../components/WelcomeMultiStep";
+import { Helmet } from 'react-helmet';
 
 
 class HomePage extends Component {
@@ -30,46 +31,81 @@ class HomePage extends Component {
   render() {
     const { step } = this.state;
 
+
     switch (step) {
       case 'Desktop':
         return (
-          <Layout>
-            <div>
-              <Grid>
-                <Grid.Row>
-                  <Grid.Column width={2}>
-                  </Grid.Column>
-                  <Grid.Column width={12}>
-                    <br /><br /><br />
-                    <WelcomeMultiStep deviceType="desktop" />
-                    <br /><br />
-                  </Grid.Column>
-                  <Grid.Column width={2}>
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </div>
-          </Layout>
+          <>
+            <Helmet>
+              <title>Kushal Ghimire - Web SEO and Technical Marketing</title>
+              <meta
+                name="description"
+                content="Welcome to kushalghimire.com. Learn more about me or try a web3 demonstration."
+              />
+              <meta name="og-title" content="kushalghimire.com" />
+              <meta name="og-description" content="Welcome to kushalghimire.com" />
+              <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
+            </Helmet>
+            <Layout>
+              <div>
+                <Grid>
+                  <Grid.Row>
+                    <Grid.Column width={2}>
+                    </Grid.Column>
+                    <Grid.Column width={12}>
+                      <br /><br /><br />
+                      <WelcomeMultiStep deviceType="desktop" />
+                      <br /><br />
+                    </Grid.Column>
+                    <Grid.Column width={2}>
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </div>
+            </Layout>
+          </>
         );
 
       case 'Mobile':
         return (
-          <Layout>
-            <div>
-              <Grid>
-                <Grid.Row>
-                  <Grid.Column>
-                  <WelcomeMultiStep deviceType="mobile" />
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </div>
-          </Layout>
+          <>
+            <Helmet>
+              <title>Kushal Ghimire - Web SEO and Technical Marketing</title>
+              <meta
+                name="description"
+                content="Welcome to kushalghimire.com. Learn more about me or try a web3 demonstration."
+              />
+              <meta name="og-title" content="kushalghimire.com" />
+              <meta name="og-description" content="Welcome to kushalghimire.com" />
+              <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
+            </Helmet>
+            <Layout>
+              <div>
+                <Grid>
+                  <Grid.Row>
+                    <Grid.Column>
+                      <WelcomeMultiStep deviceType="mobile" />
+                    </Grid.Column>
+                  </Grid.Row>
+                </Grid>
+              </div>
+            </Layout>
+          </>
         );
       default:
         return (
-          <div>
-          </div>
+          <>
+            <Helmet>
+              <title>Kushal Ghimire - Web SEO and Technical Marketing</title>
+              <meta
+                name="description"
+                content="Welcome to kushalghimire.com. Learn more about me or try a web3 demonstration."
+              />
+              <meta name="og-title" content="kushalghimire.com" />
+              <meta name="og-description" content="Welcome to kushalghimire.com" />
+              <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
+            </Helmet>
+          </>
         );
     }
   }

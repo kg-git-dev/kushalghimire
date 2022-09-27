@@ -110,7 +110,7 @@ contract Campaign {
         lastPayment.push(0);
         responseCounter++;
         skipCounter++;
-        if(skipCounter >=3){
+        if(skipCounter >=3 || responseCounter ==6){
             repossesed[this] = true;
             availableForBid.push(this);
 

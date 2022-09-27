@@ -24,15 +24,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/auctions/auctionList": [
+    "/homePage": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/auctions/auctionList.js"
-    ],
-    "/auctions/show": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/auctions/show.js"
+      "static/chunks/pages/homePage.js"
     ]
   },
   "ampFirstPages": []

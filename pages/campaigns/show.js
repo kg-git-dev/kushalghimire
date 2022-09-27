@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Card, Grid, Button, Segment, Rail, Image, Statistic, Icon, Progress, Message, GridColumn } from "semantic-ui-react";
+import { Card, Grid, Button, Segment, Rail, Image, Statistic, Icon, Progress, Message, GridColumn, Modal, Header } from "semantic-ui-react";
 import { Router } from "../../routes";
 import Layout from "../../components/Layout";
 import Campaign from "../../ethereum/campaign";
@@ -12,10 +12,11 @@ class CampaignShow extends Component {
   state = {
     loading: false,
     update_counter: '',
-    completed_contract: false,
+    final_payment: false,
     broken_contract: false,
     makePayment: '',
     errorMessage: '',
+    open: false,
   }
 
   static async getInitialProps(props) {
@@ -33,6 +34,13 @@ class CampaignShow extends Component {
 
     const requestCount = await campaign.methods.responseCounter().call();
     console.log(requestCount);
+
+    const repossesedStatus = await campaign.methods.repossesed(props.query.address).call();
+
+    const leaseOwner = await campaign.methods.owner(summary[0]).call();
+
+
+
 
     let nextPayment;
 
@@ -57,7 +65,7 @@ class CampaignShow extends Component {
 
 
     const paymentTime = new Date(requests[0] * 1000).toLocaleString("en-US")
-    console.log(paymentTime);
+
 
     const paymentStatus = await Promise.all(
       Array(parseInt(requestCount))
@@ -67,7 +75,16 @@ class CampaignShow extends Component {
         })
     );
 
-    console.log(paymentStatus[0]);
+    const lastPayment = await Promise.all(
+      Array(parseInt(requestCount))
+        .fill()
+        .map((element, index) => {
+          return campaign.methods.lastPayment(index).call();
+        })
+    );
+
+
+    // console.log(paymentStatus[0]);
 
 
     return {
@@ -81,6 +98,10 @@ class CampaignShow extends Component {
       initializationTime: initializationTime,
       requests: requests,
       paymentStatus: paymentStatus,
+      lastPayment: lastPayment,
+      repossesedStatus: repossesedStatus,
+      leaseOwner: leaseOwner,
+      requestCount: requestCount,
     };
 
   }
@@ -91,12 +112,6 @@ class CampaignShow extends Component {
         return `making payment of ${this.props.nextPayment}`
       case 'skipPayment':
         return 'skipping payment'
-      case '1':
-        return 'Payment no.1';
-      case '2':
-        return 'Payment no.2'
-      case '3':
-        return 'Testing'
       default:
         return 'foo';
     }
@@ -106,7 +121,7 @@ class CampaignShow extends Component {
   renderRows() {
     const items = this.props.requests.map((request, index) => {
       return {
-        header: `${(this.props.paymentStatus[index]) ? 'PAYMENT OF ' + web3.utils.fromWei(this.props.nextPayment, "ether") + ' ETHER' : 'SKIPPED PAYMENT'}`,
+        header: `${(this.props.paymentStatus[index]) ? 'Payment of ' + web3.utils.fromWei(this.props.lastPayment[index], "gwei") + ' ' : 'SKIPPED PAYMENT'}`,
         description: new Date(request * 1000).toLocaleString("en-US"),
         fluid: true,
       };
@@ -169,9 +184,9 @@ class CampaignShow extends Component {
       this.setState({ errorMessage: err.message });
       console.log(err);
     }
-    this.setState({ update_counter: Number(this.props.responseCounter) + 1});
-    Router.pushRoute(`/campaigns/${this.props.address}`);
-    this.setState({loading: false})
+    this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
+    Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ loading: false }));
+
   }
 
   skipPayment = async () => {
@@ -187,14 +202,37 @@ class CampaignShow extends Component {
       this.setState({ errorMessage: err.message });
       console.log(err);
     }
-    this.setState({ update_counter: Number(this.props.responseCounter) + 1});
-    Router.pushRoute(`/campaigns/${this.props.address}`);
-    this.setState({loading: false})
+    this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
+    Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ loading: false }));
+
+  }
+
+  setModalOff = () => {
+    this.setState({ open: false, errorMessage: false })
+  }
+
+  setModalOn = () => {
+    this.setState({ open: true })
+  }
+
+  skipPaymentModal = async () => {
+    this.setState({ final_payment: true })
+    // try {
+    //   const campaign = Campaign(this.props.address);
+    //   const accounts = await web3.eth.getAccounts();
+    //   await campaign.methods.skipPayment().send({
+    //     from: accounts[0],
+    //   });
+    // } catch (err) {
+    //   this.setState({ errorMessage: err.message });
+    //   console.log(err);
+    // }
+    // Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ open: false, final_payment: false }));
 
   }
 
   render() {
-    const { completed_contract, broken_contract, loading, makePayment, update_counter } = this.state;
+    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment } = this.state;
 
     const {
       leasedBy,
@@ -204,12 +242,52 @@ class CampaignShow extends Component {
       remainingPayment,
       nextPayment,
       initializationTime,
+      repossesedStatus,
+      leaseOwner,
+      requests,
+      requestCount,
 
     } = this.props;
 
     return (
       <Layout>
         {/* {this.paymentProgressSwitch(indicatorProgress)} */}
+        <Modal
+          basic
+          onClose={this.setModalOff}
+          onOpen={this.setModalOn}
+          open={open}
+          size='small'
+          dimmer='blurring'
+        >
+          <Modal.Content><p><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+          </p></Modal.Content>
+
+          <Header icon>
+            <Icon name='warning circle' color="red" />
+            Are you sure you want to skip the next payment?
+          </Header>
+          <Modal.Content>
+            <p>
+              Skipping next payment will cause the lease to be repossesed and made available for auction.
+            </p>
+          </Modal.Content>
+          {this.state.final_payment ? <Message icon>
+            <Icon name='circle notched' loading />
+            <Message.Content>
+              <Message.Header>Skipping Payment</Message.Header>
+              The lease has been repossesed due to non compliance with terms and conditions and will be set for auction.
+            </Message.Content>
+          </Message> : ''}
+          <Modal.Actions>
+            {!this.state.final_payment ? <div><Button basic color='red' inverted onClick={this.setModalOff}>
+              <Icon name='remove' /> No
+            </Button>
+              <Button color='green' inverted onClick={this.skipPaymentModal}>
+                <Icon name='checkmark' /> Yes
+              </Button></div> : ''}
+          </Modal.Actions>
+        </Modal>
 
         <br /><br />
         <Grid>
@@ -218,7 +296,7 @@ class CampaignShow extends Component {
               <Segment>
                 <Statistic >
                   <Statistic.Value text>
-                    LEASE<br />REPOSSESED
+                    {repossesedStatus ? ('SENT TO AUCTION') : leaseOwner ? ('OWNERSHIP TRANSFERED') : <div>LEASE<br />ACTIVE</div>}
                   </Statistic.Value>
                   <Statistic.Label>Status</Statistic.Label>
                 </Statistic>
@@ -227,9 +305,8 @@ class CampaignShow extends Component {
             <Grid.Column width={7} textAlign='center'>
               <Segment>
                 <Statistic>
-                  {/* <Statistic.Value>0.000133333333333333</Statistic.Value> */}
-                  <Statistic.Value>{web3.utils.fromWei(remainingPayment, "ether")}</Statistic.Value>
-                  <Statistic.Label>Remaining Balance<br />(Ether)</Statistic.Label>
+                  {<Statistic.Value>{web3.utils.fromWei(remainingPayment, "gwei")}</Statistic.Value>}
+                  <Statistic.Label>Remaining Balance<br />(PAYABLE)</Statistic.Label>
                 </Statistic>
               </Segment>
             </Grid.Column>
@@ -239,7 +316,7 @@ class CampaignShow extends Component {
 
                   <Statistic>
                     <Statistic.Value>
-                      <Icon name='checkmark' color="green" />{responseCounter}
+                      <Icon name='checkmark' color="green" />{responseCounter - skipCounter}
                     </Statistic.Value>
                     <Statistic.Label>Made<br />Payments</Statistic.Label>
                   </Statistic>
@@ -251,9 +328,10 @@ class CampaignShow extends Component {
                   </Statistic>
                   <Statistic>
                     <Statistic.Value>
-                      <Icon name='close' color="red" />{skipCounter}
+                      <Icon name='exclamation triangle' color="green" size="small" fitted />{skipCounter < 3 ? (2 - skipCounter) ? repossesedStatus : '0' : '0'}
+
                     </Statistic.Value>
-                    <Statistic.Label>Skipped</Statistic.Label>
+                    <Statistic.Label>Available<br />Skips</Statistic.Label>
                   </Statistic>
 
                 </Statistic.Group>
@@ -262,37 +340,41 @@ class CampaignShow extends Component {
           </Grid.Row>
           <Grid.Row >
             <Grid.Column width={8} textAlign='center'>
-              <Segment>
+              {repossesedStatus ? <div><Segment><p><b>THESE LEASE HAS BEEN REPOSSESED AND MADE AVAILABLE ON AUCTION</b></p><p>You can check auction list here: <a href="kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : leaseOwner ? <div><Segment><p>Installment plan successfuly completed and ownership transfered to leasee.</p></Segment></div> : <div><Segment>
                 <Statistic>
-                  <Statistic.Value>{web3.utils.fromWei(nextPayment, "ether")}</Statistic.Value>
-                  <Statistic.Label>Next Installment<br />(Ether)</Statistic.Label>
+                  <Statistic.Value>{web3.utils.fromWei(nextPayment, "gwei")}</Statistic.Value>
+                  <Statistic.Label>Next Installment</Statistic.Label>
                 </Statistic>
               </Segment>
-              <div>
-                <Progress value={Number(responseCounter) > Number(update_counter) ? responseCounter : update_counter} total='6' progress='ratio' indicating success={completed_contract} error={broken_contract} />
-                <div class='makePaymentButton'>
-                  <Button.Group>
-                    <Button disabled={loading} negative onClick={this.skipPayment}>Skip Payment</Button>
-                    <Button.Or />
-                    <Button disabled={loading} positive onClick={this.makePayment}>Make Payment</Button>
-                  </Button.Group>
-                </div>
-                <br />
                 <div>
-                  <Message hidden={!loading} icon>
-                    <Icon name='circle notched' loading />
-                    <Message.Content>
-                      <Message.Header>{this.paymentProgressSwitch(makePayment)} {update_counter}</Message.Header>
-                      {this.paymentProgressSwitch(responseCounter)}
-                    </Message.Content>
-                  </Message>
+                  <Progress value={Number(responseCounter) > Number(update_counter) ? responseCounter : update_counter} total='6' progress='ratio' indicating success={completed_contract} error={broken_contract} />
+                  <div class='makePaymentButton'>
+                    <Button.Group>
+                      <Button disabled={loading} negative onClick={responseCounter == 6 || skipCounter == 2 ? this.setModalOn : this.skipPayment}>Skip Payment</Button>
+
+                      {/* <Button disabled={loading} negative onClick={responseCounter == 6 ? this.skipPaymentModal ? skipCounter == 2 : this.skipPaymentModal : this.skipPayment}>Skip Payment</Button> */}
+                      <Button.Or />
+                      <Button disabled={loading} positive onClick={this.makePayment}>Make Payment</Button>
+                    </Button.Group>
+                  </div>
+                  <br />
+                  <div>
+                    <Message hidden={!loading} icon>
+                      <Icon name='circle notched' loading />
+                      <Message.Content>
+                        <Message.Header>{this.paymentProgressSwitch(makePayment)} </Message.Header>
+                        {this.paymentProgressSwitch(responseCounter)}
+                      </Message.Content>
+                    </Message>
+                  </div>
                 </div>
-              </div>
+              </div>}
+
             </Grid.Column>
             <Grid.Column width={4}>
-           <div>
-            <Segment><h2 style={{color: '#00308F'}}>CONTRACT INFO:</h2></Segment>
-           </div>
+              <div>
+                <Segment><h2 style={{ color: '#00308F' }}>CONTRACT INFO:</h2></Segment>
+              </div>
               <Card>
                 <Card.Content>
                   <Card.Header>{initializationTime}</Card.Header>
@@ -301,6 +383,9 @@ class CampaignShow extends Component {
                 </Card.Content>
               </Card>
               <div>
+                {repossesedStatus ? <div><Card><Card.Content><Card.Header>{new Date(requests[requestCount - 1] * 1000).toLocaleString("en-US")}</Card.Header><Card.Description>Contract repossesed and made avaialble to auction.</Card.Description></Card.Content></Card><p></p></div> : leaseOwner ? <div><Card><Card.Content><Card.Header>{new Date(requests[requestCount - 1] * 1000).toLocaleString("en-US")}</Card.Header><Card.Description>Ownership transfered to Leasee after succesful completion.</Card.Description></Card.Content></Card><p></p></div> : ''} 
+                </div>
+              <div>
                 {this.renderCards()}
               </div>
 
@@ -308,20 +393,6 @@ class CampaignShow extends Component {
             </Grid.Column>
             <Grid.Column width={4}>
               {this.renderRows()}
-            </Grid.Column>
-            
-
-          </Grid.Row>
-
-        </Grid>
-        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={10}>{this.renderCards()}</Grid.Column>
-            <Grid.Column width={6}>
-              <InstallmentIndicator responseCounter={this.props.responseCounter} />
-              <ContributeForm address={this.props.address} />
             </Grid.Column>
           </Grid.Row>
         </Grid>

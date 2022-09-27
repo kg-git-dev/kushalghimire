@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Card, Grid, Button, Segment, Rail, Image, Statistic, Icon, Progress, Message, GridColumn } from "semantic-ui-react";
+import { Card, Grid, Button, Segment, Rail, Image, Statistic, Icon, Progress, Message, Form } from "semantic-ui-react";
 import { Router } from "../../routes";
 import Layout from "../../components/Layout";
 import Campaign from "../../ethereum/campaign";
@@ -16,6 +16,7 @@ class CampaignShow extends Component {
     broken_contract: false,
     makePayment: '',
     errorMessage: '',
+    bidAmount: '',
   }
 
   static async getInitialProps(props) {
@@ -33,6 +34,22 @@ class CampaignShow extends Component {
 
     const requestCount = await campaign.methods.responseCounter().call();
     console.log(requestCount);
+
+    const resoldStatus = await campaign.methods.resold().call();
+    const repossesedStatus = await campaign.methods.repossesed(props.query.address).call();
+    const bidCounter = await campaign.methods.bidCounter().call()
+    const recentBids = await Promise.all(
+      Array(parseInt(bidCounter))
+        .fill()
+        .map((element, index) => {
+          return campaign.methods.requests(index).call();
+        })
+    );
+
+    console.log(recentBids);
+
+
+
 
     let nextPayment;
 
@@ -81,6 +98,9 @@ class CampaignShow extends Component {
       initializationTime: initializationTime,
       requests: requests,
       paymentStatus: paymentStatus,
+      resoldStatus: resoldStatus,
+      repossesedStatus: repossesedStatus,
+      recentBids: recentBids
     };
 
   }
@@ -116,62 +136,34 @@ class CampaignShow extends Component {
 
   renderCards() {
     const {
-      leasedBy,
-      paymentsMade,
-      responseCounter,
-      skipCounter,
-      remainingPayment,
+      recentBids
     } = this.props;
 
-    const items = [
-      {
-        header: leasedBy,
-        meta: "Address of Lease Owner",
-        // description:
-        //   "Address of person who currently holds the lease.",
+    const items = recentBids.map((request, index) => {
+      return {
+        key: index,
+        header: recentBids[index][0],
+        meta: "Bid made by following account",
+        description: recentBids[index][1],
         style: { overflowWrap: "anywhere" },
-      },
-      // {
-      //   header: responseCounter,
-      //   meta: "Total number of installments completed",
-      //   description:
-      //     "Installment counter out of 6.",
-      // },
-      // {
-      //   header: skipCounter,
-      //   meta: "Number of installments skipped",
-      //   description:
-      //     "Total installment skipped. Maximum of 2. 3 missed installment means repossesion.",
-      // },
-      // {
-      //   header: web3.utils.fromWei(remainingPayment, "ether"),
-      //   meta: "Value of remaining contract balance",
-      //   description:
-      //     "the value auto corrects if any installment is missed to clear the sum.",
-      // },
-    ];
-
-    return <Card.Group items={items} />;
+      };
+    });
+    return <Card.Group items={items} />
   }
 
   makePayment = async () => {
     const campaign = Campaign(this.props.address);
-    this.setState({ loading: true, makePayment: 'makePayment' });
+    console.log('here');
 
     try {
       const accounts = await web3.eth.getAccounts();
-      const nextPayment = await campaign.methods.getNextInstallment().call();
-      await campaign.methods.makePayment().send({
-        from: accounts[0],
-        value: nextPayment
-      });
+      const userBid = '0.0006';
+      await campaign.methods
+        .makeBid(web3.utils.toWei(userBid, "ether"))
+        .send({ from: accounts[0] });
     } catch (err) {
-      this.setState({ errorMessage: err.message });
       console.log(err);
     }
-    this.setState({ update_counter: Number(this.props.responseCounter) + 1});
-    Router.pushRoute(`/campaigns/${this.props.address}`);
-    this.setState({loading: false})
   }
 
   skipPayment = async () => {
@@ -187,14 +179,37 @@ class CampaignShow extends Component {
       this.setState({ errorMessage: err.message });
       console.log(err);
     }
-    this.setState({ update_counter: Number(this.props.responseCounter) + 1});
+    this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
     Router.pushRoute(`/campaigns/${this.props.address}`);
-    this.setState({loading: false})
+    this.setState({ loading: false })
+
+  }
+
+  handleSubmit = async () => {
+    const campaign = Campaign(this.props.address);
+    this.setState({bidAmount: this.state.bidAmount})
+    
+    try {
+      const accounts = await web3.eth.getAccounts();
+      const userBid = '0.0006';
+      await campaign.methods
+        .makeBid(web3.utils.toWei(this.state.bidAmount, "ether"))
+        .send({ from: accounts[0] });
+    } catch (err) {
+      console.log(err);
+    }
+    Router.pushRoute(`/auctions/${this.props.address}`);
+    this.setState({ loading: false })
+
+  }
+
+  handleChange = (event) => {
+    this.setState({bidAmount: event.target.value})
 
   }
 
   render() {
-    const { completed_contract, broken_contract, loading, makePayment, update_counter } = this.state;
+    const { completed_contract, broken_contract, loading, makePayment, update_counter, bidAmount } = this.state;
 
     const {
       leasedBy,
@@ -204,6 +219,9 @@ class CampaignShow extends Component {
       remainingPayment,
       nextPayment,
       initializationTime,
+      resoldStatus,
+      repossesedStatus,
+      requests,
 
     } = this.props;
 
@@ -216,11 +234,10 @@ class CampaignShow extends Component {
           <Grid.Row >
             <Grid.Column width={4} textAlign='center'>
               <Segment>
-                <Statistic >
+                <Statistic color={resoldStatus ? 'red' : 'green'}>
                   <Statistic.Value text>
-                    LEASE<br />REPOSSESED
+                    {resoldStatus ? 'AUCTION CLOSED' : 'AVAILABLE TO BID'}
                   </Statistic.Value>
-                  <Statistic.Label>Status</Statistic.Label>
                 </Statistic>
               </Segment>
             </Grid.Column>
@@ -228,55 +245,47 @@ class CampaignShow extends Component {
               <Segment>
                 <Statistic>
                   {/* <Statistic.Value>0.000133333333333333</Statistic.Value> */}
-                  <Statistic.Value>{web3.utils.fromWei(remainingPayment, "ether")}</Statistic.Value>
-                  <Statistic.Label>Remaining Balance<br />(Ether)</Statistic.Label>
+                  <Statistic.Value>{web3.utils.fromWei(remainingPayment, "gwei")}</Statistic.Value>
+                  <Statistic.Label>BUY OUT AMOUNT</Statistic.Label>
                 </Statistic>
               </Segment>
             </Grid.Column>
-            <Grid.Column width={5}>
+            <Grid.Column width={5} textAlign='center'>
               <Segment>
-                <Statistic.Group widths={3}>
-
-                  <Statistic>
-                    <Statistic.Value>
-                      <Icon name='checkmark' color="green" />{responseCounter}
-                    </Statistic.Value>
-                    <Statistic.Label>Made<br />Payments</Statistic.Label>
-                  </Statistic>
-                  <Statistic>
-                    <Statistic.Value>
-                      <Icon name='close' color="red" />{skipCounter}
-                    </Statistic.Value>
-                    <Statistic.Label>Skipped<br />Payment</Statistic.Label>
-                  </Statistic>
-                  <Statistic>
-                    <Statistic.Value>
-                      <Icon name='close' color="red" />{skipCounter}
-                    </Statistic.Value>
-                    <Statistic.Label>Skipped</Statistic.Label>
-                  </Statistic>
-
-                </Statistic.Group>
+                <Statistic size="tiny">
+                  {/* <Statistic.Value>0.000133333333333333</Statistic.Value> */}
+                  <Statistic.Value>{web3.utils.fromWei(remainingPayment, "gwei")}</Statistic.Value>
+                  <Statistic.Label>CURRENT HIGHEST BID</Statistic.Label>
+                </Statistic>
               </Segment>
             </Grid.Column>
           </Grid.Row>
           <Grid.Row >
             <Grid.Column width={8} textAlign='center'>
-              <Segment>
-                <Statistic>
-                  <Statistic.Value>{web3.utils.fromWei(nextPayment, "ether")}</Statistic.Value>
-                  <Statistic.Label>Next Installment<br />(Ether)</Statistic.Label>
-                </Statistic>
-              </Segment>
-              <div>
-                <Progress value={Number(responseCounter) > Number(update_counter) ? responseCounter : update_counter} total='6' progress='ratio' indicating success={completed_contract} error={broken_contract} />
-                <div class='makePaymentButton'>
-                  <Button.Group>
-                    <Button disabled={loading} negative onClick={this.skipPayment}>Skip Payment</Button>
-                    <Button.Or />
-                    <Button disabled={loading} positive onClick={this.makePayment}>Make Payment</Button>
-                  </Button.Group>
+              <Form onSubmit={this.handleSubmit}>
+                <Form.Input
+                  error={this.state.bidAmount < 60000}
+                  size='massive'
+                  fluid
+                  placeholder={`minimum bid of ${web3.utils.fromWei(requests[0][1], "gwei")} `}
+                  id='form-input-first-name'
+                  defaultValue={bidAmount}
+                  onChange={this.handleChange}
+                />
+                <div className='makePaymentButton'>
+                <Button.Group>
+                <Form.Button disabled={this.state.bidAmount < 60000} content="Submit Bid" color="orange"></Form.Button>
+                <Button.Or />
+                <Form.Button content="Claim Highest Bid" color='yellow'></Form.Button>
+                <Button.Or />
+                <Form.Button content="Buy out Contract" color='green'></Form.Button>
+                </Button.Group>
                 </div>
+                </Form>
+
+              <div>
+                <br /><br /><br />
+                
                 <br />
                 <div>
                   <Message hidden={!loading} icon>
@@ -290,16 +299,11 @@ class CampaignShow extends Component {
               </div>
             </Grid.Column>
             <Grid.Column width={4}>
-           <div>
-            <Segment><h2 style={{color: '#00308F'}}>CONTRACT INFO:</h2></Segment>
-           </div>
-              <Card>
-                <Card.Content>
-                  <Card.Header>{initializationTime}</Card.Header>
-                  <Card.Meta>Downpayment of 0.0004 ether made and lease initialized.</Card.Meta>
-                  {/* <Card.Description>Downpayment of 0.0004 ether made and lease initialized.</Card.Description> */}
-                </Card.Content>
-              </Card>
+              <div>
+                <Segment><h2 style={{ color: '#00308F' }}>RECENT BIDS:</h2></Segment>
+                <p></p>
+              </div>
+
               <div>
                 {this.renderCards()}
               </div>
@@ -307,23 +311,18 @@ class CampaignShow extends Component {
 
             </Grid.Column>
             <Grid.Column width={4}>
-              {this.renderRows()}
+              <Card>
+                <Card.Content>
+                  <Card.Header>{initializationTime}</Card.Header>
+                  <Card.Meta>Downpayment of 0.0004 ether made and lease initialized.</Card.Meta>
+                  {/* <Card.Description>Downpayment of 0.0004 ether made and lease initialized.</Card.Description> */}
+                </Card.Content>
+              </Card>
             </Grid.Column>
-            
+
 
           </Grid.Row>
 
-        </Grid>
-        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={10}>{this.renderCards()}</Grid.Column>
-            <Grid.Column width={6}>
-              <InstallmentIndicator responseCounter={this.props.responseCounter} />
-              <ContributeForm address={this.props.address} />
-            </Grid.Column>
-          </Grid.Row>
         </Grid>
       </Layout>
     );

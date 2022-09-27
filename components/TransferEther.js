@@ -14,7 +14,8 @@ class TransferEther extends Component {
         loading: false,
         errorMessage: false,
         open: false,
-        loading: false
+        loading: false,
+        alreadyReceived: false,
     }
 
     modalEtherTransfer = async () => {
@@ -24,68 +25,82 @@ class TransferEther extends Component {
             method: 'eth_chainId',
         })
         if (chainId == '0x4') {
-            this.setState({ loading: true });
-            const subscriberData = this.props.subscriberName + ' from ' + this.props.subscriberIp;
-            console.log(subscriberData);
-            const owner = await compileDonation.methods.owner().call();
-            const myNonce = await web3.eth.getTransactionCount(owner);
-            const accounts = await web3.eth.getAccounts();
-            // const contractAddress = '0x3D3E3a0767045f4f05CAB6cecA24325F234e3058';
-            // const privateKey = '6ffc83620b302d5a4b3c7c28975e984ac298e94b5c7ff5c37c08bf2cf4c8eb63';
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const receivedStatus = await compileDonation.methods.alreadyRecieved(accounts[0]).call();
+                this.setState({alreadyReceived: receivedStatus})
+            } catch (err) {
+                console.log(error);
+            }
 
-            // const signHash = EthCrypto.hash.keccak256([
-            //     { // prefix
-            //         type: 'string',
-            //         value: 'Signed for DonationBag:'
-            //     }, { // contractAddress
-            //         type: 'address',
-            //         value: contractAddress
-            //     }, { // owner Address
-            //         type: 'address',
-            //         value: owner
-            //     }
-            // ]);
-            // const signature = EthCrypto.sign(
-            //     privateKey,
-            //     signHash
-            // );
-            // const vrs = EthCrypto.vrs.fromString(signature);
+            if (!this.state.alreadyReceived){
+                this.setState({ loading: true });
+                const subscriberData = this.props.subscriberName + ' from ' + this.props.subscriberIp;
+                console.log(subscriberData);
+                const owner = await compileDonation.methods.owner().call();
+                const myNonce = await web3.eth.getTransactionCount(owner);
+                const accounts = await web3.eth.getAccounts();
+                const contractAddress = '0x3D3E3a0767045f4f05CAB6cecA24325F234e3058';
+                const privateKey = '6ffc83620b302d5a4b3c7c28975e984ac298e94b5c7ff5c37c08bf2cf4c8eb63';
+    
+                const signHash = EthCrypto.hash.keccak256([
+                    { // prefix
+                        type: 'string',
+                        value: 'Signed for DonationBag:'
+                    }, { // contractAddress
+                        type: 'address',
+                        value: contractAddress
+                    }, { // owner Address
+                        type: 'address',
+                        value: owner
+                    }
+                ]);
+                const signature = EthCrypto.sign(
+                    privateKey,
+                    signHash
+                );
+                const vrs = EthCrypto.vrs.fromString(signature);
+    
+                const recieveCode = compileDonation
+                    .methods.recieveDonation(
+                        accounts[0],
+                        subscriberData,
+                        vrs.v,
+                        vrs.r,
+                        vrs.s
+                    ).encodeABI();
+                // Creating a signing account from a private key
+                const signer = web3.eth.accounts.privateKeyToAccount(
+                    privateKey
+                );
+                web3.eth.accounts.wallet.add(signer);
+    
+                const tx = {
+                    from: owner,
+                    to: contractAddress,
+                    nonce: myNonce,
+                    data: recieveCode
+                };
+                // Assigning the right amount of gas
+                tx.gas = await web3.eth.estimateGas(tx);
+    
+                // Sending the transaction to the network
+                const receipt = await web3.eth
+                    .sendTransaction(tx)
+                    .once("transactionHash", (txhash) => {
+                        console.log(`Mining transaction ...`);
+                        console.log(`https://rinkeby.etherscan.io/tx/${txhash}`);
+                    });
+                // The transaction is now on chain!
+                console.log(`Mined in block ${receipt.blockNumber}`);
+                this.setState({ loading: false })
+                this.setModalOff();
+                this.props.modalControlNext();
+             }else{
+                this.setModalOff();
+                this.props.modalControlNext();
+             }
 
-            // const recieveCode = compileDonation
-            //     .methods.recieveDonation(
-            //         accounts[0],
-            //         subscriberData,
-            //         vrs.v,
-            //         vrs.r,
-            //         vrs.s
-            //     ).encodeABI();
-            // // Creating a signing account from a private key
-            // const signer = web3.eth.accounts.privateKeyToAccount(
-            //     privateKey
-            // );
-            // web3.eth.accounts.wallet.add(signer);
-
-            // const tx = {
-            //     from: owner,
-            //     to: contractAddress,
-            //     nonce: myNonce,
-            //     data: recieveCode
-            // };
-            // // Assigning the right amount of gas
-            // tx.gas = await web3.eth.estimateGas(tx);
-
-            // // Sending the transaction to the network
-            // const receipt = await web3.eth
-            //     .sendTransaction(tx)
-            //     .once("transactionHash", (txhash) => {
-            //         console.log(`Mining transaction ...`);
-            //         console.log(`https://rinkeby.etherscan.io/tx/${txhash}`);
-            //     });
-            // // The transaction is now on chain!
-            // console.log(`Mined in block ${receipt.blockNumber}`);
-            this.setState({ loading: false })
-            this.setModalOff();
-            this.props.modalControlNext();
         } else {
             this.setState({ errorMessage: true })
             // this.props.nextStepTest();
