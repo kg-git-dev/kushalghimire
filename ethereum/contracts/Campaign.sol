@@ -7,7 +7,7 @@ contract CampaignFactory {
     event ContractCreation(uint256 timestamp);
 
     function createCampaign() public payable  {
-        require(msg.value == 0.0004 ether);
+        require(msg.value == 0.00004 ether);
         address newCampaign = new Campaign(msg.sender, msg.value);
         deployedCampaigns.push(newCampaign);
         0x29712BB596518b292595BD5620cb2d5b73Dad899.transfer(msg.value);
@@ -41,7 +41,7 @@ contract Campaign {
     uint public installment;
     uint public responseCounter;
     uint public skipCounter;
-    uint public remainingPayment = 0.0006 ether;
+    uint public remainingPayment = 0.00006 ether;
     uint public auctionPrice;
     uint i;
 
