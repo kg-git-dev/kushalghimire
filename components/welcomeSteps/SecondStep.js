@@ -156,7 +156,7 @@ class SecondStep extends Component {
                     <li>Forfeited vehicles to be offered in auction with the revenue from sale transfered to KG motors for balance owed. Surplus balance transfered to forfeiting party.</li>
                     <li>In auction, bids have to exceed prior bids to be registered.</li>
                     <li>In auction, contracts can be bought out if matched the buy out clause. </li>
-                    <li>In order to interact with the ethereum blockchain network, an initializing balance of 0.0015 rinkeby ether will be transfered into your account. </li>
+                    <li>In order to interact with the ethereum blockchain network, an initializing balance of 0.01 Rinkeby Ether will be transfered into your account.</li>
                     <li>A user can request ether once with one wallet key.</li>
                   </ul>
                 </div>

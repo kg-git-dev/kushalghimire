@@ -31,7 +31,7 @@ class Admin extends Component {
     const tx = {
       from: signer.address,
       to: contractAddress,
-      value: web3.utils.toWei("0.003"),
+      value: web3.utils.toWei("0.03"),
     };
     // Assigning the right amount of gas
     tx.gas = await web3.eth.estimateGas(tx);
