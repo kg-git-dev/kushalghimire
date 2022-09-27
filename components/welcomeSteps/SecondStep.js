@@ -136,47 +136,28 @@ class SecondStep extends Component {
             </div>
             <div>
               <h3 class="ui block header">
-                TERMS AND CONDITIONS FOR THE DEMONSTRATION!
+                TERMS AND CONDITIONS FOR THE SALE OF CYBERTRUCK (HYPOTHETICAL)!
               </h3>
             </div>
             <div>
               <div>
-                <br/><p>KG Motors is proud to announce our (<i>hypothetical</i>) partnership with Tesla Cyber Truck. As authorized sellers, we are offering a specialized financing package of 40% downpayment and 4 to 6 even payments.</p>
+                <br/><p>KG Motors is proud to announce our partnership with Tesla Cyber Truck. As authorized sellers, we are offering a specialized financing package of 40% downpayment and 4 to 6 even payments.</p>
                 <p>In lieu of transparency, missing more than 2 or the final payment will result in the car being repossesed and sold in auction.</p>
-                <p>Signees are requested to review the terms carefully since the path will be executed exactly as defined in the contract and cannot be altered or intervined with.</p>
+                <p>Signees are requested to review the terms carefully since the path will be executed exactly as defined in the contract and cannot be altered or intervened with.</p>
                </div>
               <div class="ui list">
                 <div class="item">
-                  <div class="header">Initialize your Wallet</div>
-                  An initializing balance of 0.0015 ether is transfered into your account. 
+                  <div class="header">Key Details: </div>
                   <ul>
-                    <li>Please note it requires connection to the Rinkeby Test Network. Connecting to the test network is documented after the "Continue" button.</li>
-                    <li>A user can request ether once with one wallet key.</li>
-                    <li>Blockchain protocol requires initiating party to pay for gas fees. However, since it is unlikely users had access to Rinkeby Ether to initialize the contract, we will transfer the amount of 0.001 ether to interact with the contract (<i>Assuming, user paid US dollar to get the currency equvalence transfered into their account</i>).</li>
-                  </ul>
-                </div>
-                <div class="item">
-                  <div class="header">Initialize the contract</div>
-                  You can initialize the contract to lease a new KG Motor Cars by making a downpayment of 0.004 ether. The deposit is non refundable and paid directly to KG Motors.
-                  <ul>
-                    <li>Coming in the next page</li>
-                  </ul>
-                </div>
-                <div class="item">
-                  <div class="header">Lease Regulations</div>
-                  There are certain regulations to be followed for the correct compliance of the lease contract.
-                  <ul>
-                    <li>The remaining balance to be paid in 6 installments.</li>
+                    <li>The contract can be initialized by making a downpayment of 0.00004 Rinkeby Test Ether. The deposit is non refundable and paid directly to KG Motors.</li>
+                    <li>The remaining balance to be paid in between 4 to 6 installments.</li>
                     <li>Lease Owner is permitted a maximum of 2 missed payments. Third miss results in forfeiture.</li>
                     <li>Missing the final payment results in forfeiture.</li>
-                    <li>Forfeited vehicles to be offered in auction. With the balance from auction sale transfered to KG motors for balance owed. Surplus balance transfered to forfeiting party.</li>
-                  </ul>
-                </div>
-                <div class="item">
-                  <div class="header">Auction Regulatoins</div>
-                  Repossesed contracts will be available for auction with maximum bidding price set to the remaining balance for practicality.
-                  <ul>
-                    <li>Bids have to exceed prior bids to be registered.</li>
+                    <li>Forfeited vehicles to be offered in auction with the revenue from sale transfered to KG motors for balance owed. Surplus balance transfered to forfeiting party.</li>
+                    <li>In auction, bids have to exceed prior bids to be registered.</li>
+                    <li>In auction, contracts can be bought out if matched the buy out clause. </li>
+                    <li>In order to interact with the ethereum blockchain network, an initializing balance of 0.0015 rinkeby ether will be transfered into your account. </li>
+                    <li>A user can request ether once with one wallet key.</li>
                   </ul>
                 </div>
               </div>
@@ -192,14 +173,6 @@ class SecondStep extends Component {
               />
             </div>
           </Segment>
-          {/* <div>
-            <Tutorial
-              nextStepTest={this.nextStepTest}
-              subscriberName={subscriberName}
-              subscriberIp={subscriberIp}
-              subscriberCountry={subscriberCountry}
-            /><br />
-          </div> */}
         </Grid.Column>
       </div>
     )
