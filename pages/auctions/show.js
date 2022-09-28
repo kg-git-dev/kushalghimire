@@ -5,6 +5,7 @@ import { Router } from "../../routes";
 import Layout from "../../components/Layout";
 import Campaign from "../../ethereum/campaign";
 import web3 from "../../ethereum/web3";
+import { ethers } from "ethers";
 import ContributeForm from "../../components/ContributeForm";
 import InstallmentIndicator from "../../components/installments/indicator";
 
@@ -27,7 +28,7 @@ class CampaignShow extends Component {
     const summary = await campaign.methods.getSummary().call();
     // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
 
-    const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=0x24C34A9F146ebAC2beED13F8fD0371C7246c3733&blocktype=blocks&apikey=${etherscan_api}`);
+    const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`);
     const initializationDate = etherscan.data.result[0].timeStamp;
     const initializationTime = new Date(initializationDate * 1000).toLocaleString("en-US")
     // console.log(initializationTime);
@@ -142,7 +143,7 @@ class CampaignShow extends Component {
     const items = recentBids.map((request, index) => {
       return {
         key: index,
-        header: recentBids[index][0],
+        header: `${web3.utils.fromWei(recentBids[index][0], 'gwei')}`,
         meta: "Bid made by following account",
         description: recentBids[index][1],
         style: { overflowWrap: "anywhere" },
@@ -187,24 +188,25 @@ class CampaignShow extends Component {
 
   handleSubmit = async () => {
     const campaign = Campaign(this.props.address);
-    this.setState({bidAmount: this.state.bidAmount})
-    
+    this.setState({ bidAmount: this.state.bidAmount })
+    const decimals = 10;
+    const amount = ethers.utils.parseUnits(this.state.bidAmount, decimals)  ;
+
     try {
       const accounts = await web3.eth.getAccounts();
-      const userBid = '0.0006';
       await campaign.methods
-        .makeBid(web3.utils.toWei(this.state.bidAmount, "ether"))
+        .makeBid(amount)
         .send({ from: accounts[0] });
     } catch (err) {
       console.log(err);
     }
-    Router.pushRoute(`/auctions/${this.props.address}`);
-    this.setState({ loading: false })
+    window.location.reload();
+
 
   }
 
   handleChange = (event) => {
-    this.setState({bidAmount: event.target.value})
+    this.setState({ bidAmount: event.target.value })
 
   }
 
@@ -245,7 +247,7 @@ class CampaignShow extends Component {
               <Segment>
                 <Statistic>
                   {/* <Statistic.Value>0.000133333333333333</Statistic.Value> */}
-                  <Statistic.Value>{web3.utils.fromWei(remainingPayment, "gwei")}</Statistic.Value>
+                  <Statistic.Value>60000</Statistic.Value>
                   <Statistic.Label>BUY OUT AMOUNT</Statistic.Label>
                 </Statistic>
               </Segment>
@@ -264,28 +266,28 @@ class CampaignShow extends Component {
             <Grid.Column width={8} textAlign='center'>
               <Form onSubmit={this.handleSubmit}>
                 <Form.Input
-                  error={this.state.bidAmount < 60000}
+                  error={this.state.bidAmount < 45000}
                   size='massive'
                   fluid
-                  placeholder={`minimum bid of ${web3.utils.fromWei(requests[0][1], "gwei")} `}
+                  // placeholder={`minimum bid of ${web3.utils.fromWei(requests[0][1], "gwei")} `}
                   id='form-input-first-name'
                   defaultValue={bidAmount}
                   onChange={this.handleChange}
                 />
                 <div className='makePaymentButton'>
-                <Button.Group>
-                <Form.Button disabled={this.state.bidAmount < 60000} content="Submit Bid" color="orange"></Form.Button>
-                <Button.Or />
-                <Form.Button content="Claim Highest Bid" color='yellow'></Form.Button>
-                <Button.Or />
-                <Form.Button content="Buy out Contract" color='green'></Form.Button>
-                </Button.Group>
+                  <Button.Group>
+                    <Form.Button disabled={this.state.bidAmount < 45000} content="Submit Bid" color="orange"></Form.Button>
+                    <Button.Or />
+                    <Form.Button content="Claim Highest Bid" color='yellow'></Form.Button>
+                    <Button.Or />
+                    <Form.Button content="Buy out Contract" color='green'></Form.Button>
+                  </Button.Group>
                 </div>
-                </Form>
+              </Form>
 
               <div>
                 <br /><br /><br />
-                
+
                 <br />
                 <div>
                   <Message hidden={!loading} icon>
