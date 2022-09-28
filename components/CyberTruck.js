@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
 import { Grid, Segment, Form, Button, Message, Image, Divider, Step, Icon } from 'semantic-ui-react';
-import { Slide } from 'react-slideshow-image';
-import 'react-slideshow-image/dist/styles.css';
+
 
 
 class CyberTruck extends Component {
