@@ -8,7 +8,7 @@ import { Helmet } from 'react-helmet';
 class HomePage extends Component {
   constructor(props) {
     super(props);
-    this.state = { step: 'Desktop' };
+    this.state = { step: '' };
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
   componentDidMount() {

@@ -27,7 +27,6 @@ class FirstStep extends Component {
       } else {
         this.setState({ loading: true });
         const res = await axios.get('https://geolocation-db.com/json/');
-        console.log(res.data);
         const subsriberIp = res.data.IPv4;
         const subscriberCountry = res.data.country_name;
         this.props.setSubscriberIp(subsriberIp, subscriberCountry);
@@ -47,18 +46,18 @@ class FirstStep extends Component {
             <div> 
     
                 <Form warning={!!this.state.subscribeWarning}>
-                      <div class="ui segment">
-                        <h1 class="ui block header">
+                      <div className="ui segment">
+                        <h1 className="ui block header">
                         Hello there! This is <span style={{color : '#4183c4'}}>Kushal Ghimire.</span>
-                        <div class="sub header">Web SEO and Technical Marketing.</div>
+                        <div className="sub header">Web SEO and Technical Marketing.</div>
                       </h1>
-                        <div class="ui feed">
-                        <div class="event">
-                          <div class="content">
-                            <div class="summary">
+                        <div className="ui feed">
+                        <div className="event">
+                          <div className="content">
+                            <div className="summary">
                               I specialize in analyzing the market to identify openings, and thereafter design, develop and deploy technical solutions for entry and traction. This can include major operational decisions such as offering wholesale services as on online retailer and setting up the technological infrastructure to support it. 
                               <i> (I help companies scale).</i></div>
-                              <div class="extra text">Welcome to <a>kushalghimire.com</a>. This website is developed using react frontend connected via web3 to solidity developed ethereum blockchain network. The first page details some of my professional achievements while starting second page is a web3 and blockchain demonstration. The site is aimed to be interactive and informative about not just me but about the advantages of the web3 and blockchain technology in general. The project - KG Motors is aimed to demonstrate technical marketing in action. An auto mobile dealership can likely run a sustainable business by executing the proposed business model and technical stack. Hope you find the experience interesting. Thank you for visiting! 
+                              <div className="extra text">Welcome to <a>kushalghimire.com</a>. This website is developed using react frontend connected via web3 to solidity developed ethereum blockchain network. The first page details some of my professional achievements while starting second page is a web3 and blockchain demonstration. The site is aimed to be interactive and informative about not just me but about the advantages of the web3 and blockchain technology in general. The project - KG Motors is aimed to demonstrate technical marketing in action. An auto mobile dealership can likely run a sustainable business by executing the proposed business model and technical stack. Hope you find the experience interesting. Thank you for visiting! 
                               {deviceType == 'mobile' ? <div><br/><i>The demonstration is currently not supported in mobile devices. Please log in from your desktop computer.</i></div> : ''}
                               <br/><br/>
                               <i className="envelope icon"></i> <a href="mailto:ghimire.kushal@ymail.com">ghimire.kushal@ymail.com</a>
@@ -71,11 +70,11 @@ class FirstStep extends Component {
                           </div>
                       </div>
                     <br/>
-                    <div class="column">
-                      <div class="ui segment">
-                        <a class={`${this.state.provider ? 'green':'gray'} ui ribbon label`}>Overview</a>
+                    <div className="column">
+                      <div className="ui segment">
+                        <a className={`${this.state.provider ? 'green':'gray'} ui ribbon label`}>Overview</a>
                         <span>Project Details</span>
-                        <div class="summary">
+                        <div className="summary">
                           <br/>
                               <b>Before starting the project I had surface knowledge of the blockchain technology. I was however unclear on how monetary value is being assigned to a particular crypto. (<i>Who sets it, what are the basis for evaluation?</i>) Turns out the answer was pretty straightforward. It's all about "Computing Power".
                                 </b>
@@ -96,7 +95,7 @@ class FirstStep extends Component {
                                 </div>
                               </div>
                               </div>
-                              <div class="ui segment">
+                              <div className="ui segment">
                         <Form.Field>
 
                       <h3>Namaste! Who's there?</h3>
@@ -111,7 +110,7 @@ class FirstStep extends Component {
                           </div>
                           </div>
 
-                            <div><Button onClick={this.saveAndContinue} loading={this.state.loading} className={`${this.state.provider ? '':'disabled'} ui right labeled icon positive field button`} ><i class="right arrow icon"></i>
+                            <div><Button onClick={this.saveAndContinue} loading={this.state.loading} className={`${this.state.provider ? '':'disabled'} ui right labeled icon positive field button`} ><i className="right arrow icon"></i>
                               Continue</Button>
                             <Message warning header="Please share your Online Alias :)" content={this.state.subscribeWarning} />
                             </div>

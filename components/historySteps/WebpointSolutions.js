@@ -25,8 +25,8 @@ class WebPointSolutions extends Component {
                     <br />
                     <br />The initial phases became one of the most enriching experience of my career since I had a chance to directly dabble into cutting edge technology. While I started my digital career with the development of cutting edge mobile application, the past few years, were bit of a change. I prefered wordpress for rapid development as a solo developer and its favorability to small businesses as a technical marketing consultant. My time as PM at Wepoint re-introduced me to coding and brought back a long held but inactive passion. 
                 
-                    <div class="ui grid">
-                      <div class="sixteen wide column">
+                    <div className="ui grid">
+                      <div className="sixteen wide column">
                       <br /><b>One Lesson:</b>
                       <br /> - Always include buffer time in estimates.  
                       <br /><br /><b>Many Responsbilities:</b>

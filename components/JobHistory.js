@@ -51,8 +51,8 @@ class JobHistory extends React.Component {
       case 'caldwell':
         return (
           <div>
-            {deviceType == 'desktop' ? <div class="ui grid">
-              <div class="four wide column">
+            {deviceType == 'desktop' ? <div className="ui grid">
+              <div className="four wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -62,11 +62,11 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="twelve wide column">
+              <div className="twelve wide column">
                 <CaldwellUniversity deviceType={deviceType}/>
               </div>
-            </div> :<div class="ui grid">
-              <div class="sixteen wide column">
+            </div> :<div className="ui grid">
+              <div className="sixteen wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -76,7 +76,7 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="sixteen wide column">
+              <div className="sixteen wide column">
                 <CaldwellUniversity deviceType={deviceType}/>
               </div>
             </div>}
@@ -88,8 +88,8 @@ class JobHistory extends React.Component {
       case 'blueMonkey':
         return (
           <div>
-            {deviceType == 'desktop' ? <div class="ui grid">
-              <div class="four wide column">
+            {deviceType == 'desktop' ? <div className="ui grid">
+              <div className="four wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -99,11 +99,11 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="twelve wide column">
+              <div className="twelve wide column">
                 <BlueMonkeyVapes deviceType={deviceType}/>
               </div>
-            </div> :<div class="ui grid">
-              <div class="sixteen wide column">
+            </div> :<div className="ui grid">
+              <div className="sixteen wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -113,7 +113,7 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="sixteen wide column">
+              <div className="sixteen wide column">
                 <BlueMonkeyVapes deviceType={deviceType}/>
               </div>
             </div>}
@@ -124,8 +124,8 @@ class JobHistory extends React.Component {
       case 'liveReporting':
         return (
           <div>
-           {deviceType == 'desktop' ? <div class="ui grid">
-              <div class="four wide column">
+           {deviceType == 'desktop' ? <div className="ui grid">
+              <div className="four wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -135,11 +135,11 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="twelve wide column">
+              <div className="twelve wide column">
                 <LiveReporting deviceType={deviceType}/>
               </div>
-            </div> :<div class="ui grid">
-              <div class="sixteen wide column">
+            </div> :<div className="ui grid">
+              <div className="sixteen wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -149,7 +149,7 @@ class JobHistory extends React.Component {
                   step={step}
                   />
               </div>
-              <div class="sixteen wide column">
+              <div className="sixteen wide column">
                 <LiveReporting deviceType={deviceType} />
               </div>
             </div>}
@@ -160,8 +160,8 @@ class JobHistory extends React.Component {
       case 'lexpertease':
         return (
           <div>
-            {deviceType == 'desktop' ? <div class="ui grid">
-              <div class="four wide column">
+            {deviceType == 'desktop' ? <div className="ui grid">
+              <div className="four wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -171,11 +171,11 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="twelve wide column">
+              <div className="twelve wide column">
                 <LexpertEase deviceType={deviceType}/>
               </div>
-            </div> :<div class="ui grid">
-              <div class="sixteen wide column">
+            </div> :<div className="ui grid">
+              <div className="sixteen wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -185,7 +185,7 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="sixteen wide column">
+              <div className="sixteen wide column">
                 <LexpertEase deviceType={deviceType}/>
               </div>
             </div>}
@@ -196,8 +196,8 @@ class JobHistory extends React.Component {
       case 'webpoint':
         return (
           <div>
-            {deviceType == 'desktop' ? <div class="ui grid">
-              <div class="four wide column">
+            {deviceType == 'desktop' ? <div className="ui grid">
+              <div className="four wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -207,11 +207,11 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="twelve wide column">
+              <div className="twelve wide column">
                 <WebPointSolutions deviceType={deviceType}/>
               </div>
-            </div> :<div class="ui grid">
-              <div class="sixteen wide column">
+            </div> :<div className="ui grid">
+              <div className="sixteen wide column">
                 <HistoryIndicator
                   caldwellStep={this.caldwellStep}
                   lexperteaseStep={this.lexperteaseStep}
@@ -221,7 +221,7 @@ class JobHistory extends React.Component {
                   step={step}
                    />
               </div>
-              <div class="sixteen wide column">
+              <div className="sixteen wide column">
                 <WebPointSolutions deviceType={deviceType} />
               </div>
             </div>}

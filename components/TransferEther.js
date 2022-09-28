@@ -160,8 +160,7 @@ class TransferEther extends Component {
                                 </Button></Grid.Column></Grid>}
                     >
                         <Modal.Header>Switching to the Rinkeby Test Network</Modal.Header>
-                        <Header icon='arrow alternate circle right
-' content='Click on the Meta Mask browser extension and navigate to "Settings".' />
+                        <Header as = 'h2'><Icon name='arrow alternate circle right'/><Header.Content>Click on the Meta Mask browser extension and navigate to "Settings"</Header.Content></Header>
                         <Modal.Content image>
                             <Image size='big' src='metaMask.png' wrapped />
                             <Modal.Description>

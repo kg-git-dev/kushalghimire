@@ -25,8 +25,8 @@ class CaldwellUniversity extends Component {
                     The VP of Technology at Caldwell University on his first intro asked if I had ever heard of Murphy's Law. I had, in fact, not.
                     <br/>My first professional experience transitioned from white collar to blue as I transitioned from logging tech support requests to handling lights and sound for major Univeristy Events. I also played supporting roles in events' live streaming. 
                     <br />The experience taught me real life skills as I was solo operating a 200 capacity auditorioum and handling lights and sound board. This came with major responsibilities for events' success and hence the VP's wise words to stay on your toes. 
-                    <div class="ui grid">
-                      <div class={`${deviceType == 'desktop' ? 'eleven':'nine'} wide column`}>
+                    <div className="ui grid">
+                      <div className={`${deviceType == 'desktop' ? 'eleven':'nine'} wide column`}>
                       <br /><b>One Lesson:</b>
                       <br /> - Anticipate the worst because like Forrest said 's**t happens!'. 
                       <br /><br /><b>Many Responsbilities:</b>
@@ -35,25 +35,25 @@ class CaldwellUniversity extends Component {
                       <br />- Trained new hires and supervised junior personnels.
                       </div>
                       
-                      <div class={`${deviceType == 'desktop' ? 'five':'seven'} wide column`}>
+                      <div className={`${deviceType == 'desktop' ? 'five':'seven'} wide column`}>
                         <br />
-                        <div class="ui vertical fluid mini steps">
-                          <div class="step">
-                            <div class="content">
-                              <div class="title" style={{color: 'blue'}}>IT Support Associate</div>
-                              <div class="description">January 2013</div>
+                        <div className="ui vertical fluid mini steps">
+                          <div className="step">
+                            <div className="content">
+                              <div className="title" style={{color: 'blue'}}>IT Support Associate</div>
+                              <div className="description">January 2013</div>
                             </div>
                           </div>
-                          <div class="step">
-                          <div class="content">
-                              <div class="title" style={{color: 'blue'}}>IT Technician</div>
-                              <div class="description">June 2013</div>
+                          <div className="step">
+                          <div className="content">
+                              <div className="title" style={{color: 'blue'}}>IT Technician</div>
+                              <div className="description">June 2013</div>
                             </div>
                           </div>
-                          <div class="step">
-                            <div class="content">
-                              <div class="title" style={{color: 'blue'}}>Senior IT Technician</div>
-                              <div class="description">January 2015 </div>
+                          <div className="step">
+                            <div className="content">
+                              <div className="title" style={{color: 'blue'}}>Senior IT Technician</div>
+                              <div className="description">January 2015 </div>
                             </div>
                           </div>
                         </div>

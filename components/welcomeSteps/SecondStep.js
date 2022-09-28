@@ -51,8 +51,6 @@ class SecondStep extends Component {
 
     const vrs = EthCrypto.vrs.fromString(signature);
 
-    console.log(vrs);
-
     const recieveCode = compileDonation
       .methods.recieveDonation(
         accounts[0],
@@ -87,8 +85,6 @@ class SecondStep extends Component {
     // The transaction is now on chain!
     console.log(`Mined in block ${receipt.blockNumber}`);
 
-    const totalBalance = await compileDonation.methods.getBalance().call();
-    console.log(totalBalance);
 
 
     if (provider) {
@@ -97,8 +93,7 @@ class SecondStep extends Component {
 
       const chainId = await provider.request({
         method: 'eth_chainId',
-      })
-      console.log(chainId);
+      });
     } else {
 
       // if the provider is not detected, detectEthereumProvider resolves to null
@@ -123,7 +118,7 @@ class SecondStep extends Component {
         <Grid.Column>
           <Segment>
             <div>
-              <h1 class="ui header">
+              <h1 className="ui header">
                 <p> Hello <span style={{ color: '#4183c4' }}>{subscriberName ? subscriberName : 'Kind Stranger'}</span> from {subscriberCountry}!! <Flag name={subscriberCountry.toLowerCase()} />
                 </p>
               </h1>
@@ -135,7 +130,7 @@ class SecondStep extends Component {
               <p><br /></p>
             </div>
             <div>
-              <h3 class="ui block header">
+              <h3 className="ui block header">
                 TERMS AND CONDITIONS FOR THE SALE OF CYBERTRUCK (HYPOTHETICAL)!
               </h3>
             </div>
@@ -145,9 +140,9 @@ class SecondStep extends Component {
                 <p>In lieu of transparency, missing more than 2 or the final payment will result in the car being repossesed and sold in auction.</p>
                 <p>Signees are requested to review the terms carefully since the path will be executed exactly as defined in the contract and cannot be altered or intervened with.</p>
                </div>
-              <div class="ui list">
-                <div class="item">
-                  <div class="header">Key Details: </div>
+              <div className="ui list">
+                <div className="item">
+                  <div className="header">Key Details: </div>
                   <ul>
                     <li>The contract can be initialized by making a downpayment of 0.00004 Rinkeby Test Ether. The deposit is non refundable and paid directly to KG Motors.</li>
                     <li>The remaining balance to be paid in between 4 to 6 installments.</li>

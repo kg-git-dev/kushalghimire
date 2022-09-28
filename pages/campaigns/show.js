@@ -27,15 +27,16 @@ class CampaignShow extends Component {
     const summary = await campaign.methods.getSummary().call();
     // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
 
-    const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=0x24C34A9F146ebAC2beED13F8fD0371C7246c3733&blocktype=blocks&apikey=${etherscan_api}`);
+    const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`);
     const initializationDate = etherscan.data.result[0].timeStamp;
     const initializationTime = new Date(initializationDate * 1000).toLocaleString("en-US")
     // console.log(initializationTime);
 
     const requestCount = await campaign.methods.responseCounter().call();
-    console.log(requestCount);
+    // console.log(requestCount);
 
     const repossesedStatus = await campaign.methods.repossesed(props.query.address).call();
+    console.log(repossesedStatus);
 
     const leaseOwner = await campaign.methods.owner(summary[0]).call();
 
@@ -113,7 +114,7 @@ class CampaignShow extends Component {
       case 'skipPayment':
         return 'skipping payment'
       default:
-        return 'foo';
+        return '';
     }
   }
 
@@ -185,7 +186,8 @@ class CampaignShow extends Component {
       console.log(err);
     }
     this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
-    Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ loading: false }));
+    // Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ loading: false }));
+    window.location.reload();
 
   }
 
@@ -203,7 +205,10 @@ class CampaignShow extends Component {
       console.log(err);
     }
     this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
-    Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ loading: false }));
+    // Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ loading: false }));
+    window.location.reload();
+    
+
 
   }
 
@@ -217,17 +222,18 @@ class CampaignShow extends Component {
 
   skipPaymentModal = async () => {
     this.setState({ final_payment: true })
-    // try {
-    //   const campaign = Campaign(this.props.address);
-    //   const accounts = await web3.eth.getAccounts();
-    //   await campaign.methods.skipPayment().send({
-    //     from: accounts[0],
-    //   });
-    // } catch (err) {
-    //   this.setState({ errorMessage: err.message });
-    //   console.log(err);
-    // }
+    try {
+      const campaign = Campaign(this.props.address);
+      const accounts = await web3.eth.getAccounts();
+      await campaign.methods.skipPayment().send({
+        from: accounts[0],
+      });
+    } catch (err) {
+      this.setState({ errorMessage: err.message });
+      console.log(err);
+    }
     // Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ open: false, final_payment: false }));
+    window.location.reload();
 
   }
 
@@ -363,7 +369,6 @@ class CampaignShow extends Component {
                       <Icon name='circle notched' loading />
                       <Message.Content>
                         <Message.Header>{this.paymentProgressSwitch(makePayment)} </Message.Header>
-                        {this.paymentProgressSwitch(responseCounter)}
                       </Message.Content>
                     </Message>
                   </div>

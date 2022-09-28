@@ -26,8 +26,8 @@ class LiveReporting extends Component {
                     <br />In late 2016, our iOS application for private lessons, 'Assignmate', was cited to violate "the business model rule" and declined ios app store entry. Assignmate used Stripe and included a mechanism for refund. Refunding while using Apple's payment system was impossible. Apple dictates 30% flat cut from initial purchase which is non refundable to the publisher. In order to issue a refund, we had to take a 30% flat loss. 
                     <br /><br />
                     In a last ditch attempt to save months worth of work, I wrote to the App Review Board at Apple one "final" time and questioned how they expected our business model to survive without a refund process. I questioned if Steve Jobs would have envisioned Apple to let a startup die despite promising app store to be a place for publisher creativity. I questioned if us trying to issue a refund really is a problem with our business model or theirs. Assignmate was approved the next day. At first, I felt invincible, later, I realized, even the giants listen. 
-                    <div class="ui grid">
-                      <div class="sixteen wide column">
+                    <div className="ui grid">
+                      <div className="sixteen wide column">
                       <br /><b>One Lesson:</b>
                       <br /> - The ability to state your case eloquently is an underrated skill.  
                       <br /><br /><b>Many Responsbilities:</b>

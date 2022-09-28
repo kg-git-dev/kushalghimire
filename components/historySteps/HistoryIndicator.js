@@ -39,35 +39,35 @@ class HistoryIndicator extends Component {
 
     return (
         <div>                            
-                <div class="ui vertical fluid mini steps">
-                  <div class={`${this.props.step == 'caldwell'?'active':''} step link `} onClick={e => this.setCaldwell(e)} >
-                      <div class="content">
-                      <div class="title">Caldwell University</div>
-                      <div class="description">and Intro to Murphy's Law.</div>
+                <div className="ui vertical fluid mini steps">
+                  <div className={`${this.props.step == 'caldwell'?'active':''} step link `} onClick={e => this.setCaldwell(e)} >
+                      <div className="content">
+                      <div className="title">Caldwell University</div>
+                      <div className="description">and Intro to Murphy's Law.</div>
                       </div>
                   </div>
-                  <div class={`${this.props.step == 'blueMonkey'?'active':''} step link `} onClick={e => this.setBluemonkey(e)} >
-                      <div class="content">
-                      <div class="title">Blue Monkey Vapes</div>
-                      <div class="description">and Almost Famous</div>
+                  <div className={`${this.props.step == 'blueMonkey'?'active':''} step link `} onClick={e => this.setBluemonkey(e)} >
+                      <div className="content">
+                      <div className="title">Blue Monkey Vapes</div>
+                      <div className="description">and Almost Famous</div>
                       </div>
                   </div>
-                  <div class={`${this.props.step == 'liveReporting'?'active':''} step link `} onClick={e => this.setLivereporting(e)} >
-                      <div class="content">
-                      <div class="title">LiveReporting LLC.</div>
-                      <div class="description">and Job's Spirit.</div>
+                  <div className={`${this.props.step == 'liveReporting'?'active':''} step link `} onClick={e => this.setLivereporting(e)} >
+                      <div className="content">
+                      <div className="title">LiveReporting LLC.</div>
+                      <div className="description">and Job's Spirit.</div>
                       </div>
                   </div>
-                  <div class={`${this.props.step == 'lexpertease'?'active':''} step link `} onClick={e => this.setLexpertease(e)} >
-                      <div class="content">
-                      <div class="title">LexpertEase</div>
-                      <div class="description">and The Cheat Code</div>
+                  <div className={`${this.props.step == 'lexpertease'?'active':''} step link `} onClick={e => this.setLexpertease(e)} >
+                      <div className="content">
+                      <div className="title">LexpertEase</div>
+                      <div className="description">and The Cheat Code</div>
                       </div>
                   </div>
-                  <div class={`${this.props.step == 'webpoint'?'active':''} step link `} onClick={e => this.setWebpoint(e)} >
-                      <div class="content">
-                      <div class="title">Webpoint Solutions</div>
-                      <div class="description">and The Great Pivot</div>
+                  <div className={`${this.props.step == 'webpoint'?'active':''} step link `} onClick={e => this.setWebpoint(e)} >
+                      <div className="content">
+                      <div className="title">Webpoint Solutions</div>
+                      <div className="description">and The Great Pivot</div>
                       </div>            
                 </div>
             </div>
