@@ -14,7 +14,6 @@ class CampaignShow extends Component {
     super(props)
     this.state = {
       address: '',
-      initializationTime: 'LOADING',
       loading: false,
       update_counter: '',
       final_payment: false,
@@ -25,49 +24,33 @@ class CampaignShow extends Component {
     };
   }
 
-  async componentDidMount() {
-    this.gettingApiData();
-  }
+  static async getInitialProps(props) {
 
-  async componentDidUpdate(){   
-    if(this.state.initializationTime == 'LOADING'){
-      this.gettingApiData();
-    }
-  }
-
-  async gettingApiData() {
     const etherscan_api = 'U3VC9K7EK1YQUZD9XZUUUW3DQV3P29HKC2';
     const endpoint = "https://api-rinkeby.etherscan.io/api";
     const initializationTime = await axios
-      .get(endpoint + `?module=account&action=txlistinternal&address=${this.props.address}&blocktype=blocks&apikey=${etherscan_api}`)
+      .get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`)
       .then(res => {
         const { result } = res.data;
         if (result.length != 0) {
           const initializationTime = new Date(result[0].timeStamp * 1000).toLocaleString("en-US");
           return initializationTime;
         } else {
-          return 'LOADING';
+          const initializationTime = new Date(window.localStorage.getItem(1) * 1000).toLocaleString("en-US")
+          return initializationTime;
         }
       });
-    this.setState({ initializationTime: initializationTime })
-  }
 
-
-  static async getInitialProps(props) {
     const campaign = Campaign(props.query.address);
 
     const summary = await campaign.methods.getSummary().call();
-    // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
 
     const requestCount = await campaign.methods.responseCounter().call();
-    // console.log(requestCount);
 
     const repossesedStatus = await campaign.methods.repossesed(props.query.address).call();
     console.log(repossesedStatus);
 
     const leaseOwner = await campaign.methods.owner(summary[0]).call();
-
-
 
 
     let nextPayment;
@@ -78,8 +61,6 @@ class CampaignShow extends Component {
       nextPayment = '0'
     }
 
-    // const nextPayment = await campaign.methods.getNextInstallment().call();
-
     const requests = await Promise.all(
       Array(parseInt(requestCount))
         .fill()
@@ -87,9 +68,6 @@ class CampaignShow extends Component {
           return campaign.methods.transactionDate(index).call();
         })
     );
-
-    // console.log(requests);
-
 
 
     const paymentTime = new Date(requests[0] * 1000).toLocaleString("en-US")
@@ -129,6 +107,7 @@ class CampaignShow extends Component {
       repossesedStatus: repossesedStatus,
       leaseOwner: leaseOwner,
       requestCount: requestCount,
+      initializationTime: initializationTime,
     };
 
   }
@@ -245,7 +224,7 @@ class CampaignShow extends Component {
   }
 
   render() {
-    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment, errorMessage, initializationTime } = this.state;
+    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment, errorMessage } = this.state;
 
     const {
       leasedBy,
@@ -258,6 +237,7 @@ class CampaignShow extends Component {
       leaseOwner,
       requests,
       requestCount,
+      initializationTime,
 
 
     } = this.props;
@@ -319,7 +299,7 @@ class CampaignShow extends Component {
               <Segment>
                 <Statistic>
                   {<Statistic.Value>{web3.utils.fromWei(remainingPayment, "gwei")}</Statistic.Value>}
-                  <Statistic.Label>Remaining Balance <br />(PAYABLE)</Statistic.Label>
+                  <Statistic.Label>Remaining Balance<br />(PAYABLE)</Statistic.Label>
                 </Statistic>
               </Segment>
             </Grid.Column>

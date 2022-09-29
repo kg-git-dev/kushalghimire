@@ -30,7 +30,9 @@ class ThirdStep extends Component {
       const deployedAddress = deployedContract.events.TokensSent.returnValues['deployedContract'];
       this.setState({deployedAddress: deployedAddress});
       const deployedTime = deployedContract.events.ContractCreation.returnValues['timestamp'];
-      console.log(deployedTime);
+      window.localStorage.removeItem(1);
+      window.localStorage.setItem(1, deployedTime);
+
 
       // this.setState({ contractAddress: deployedAddress });
     } catch (err) {
