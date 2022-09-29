@@ -9,8 +9,9 @@ class ThirdStep extends Component {
 
   state = {
     loading: false,
-    contractAddress: ''
+    deployedAddress: '',
   };
+
 
   saveAndContinue = async () => {
 
@@ -27,17 +28,17 @@ class ThirdStep extends Component {
       });
 
       const deployedAddress = deployedContract.events.TokensSent.returnValues['deployedContract'];
+      this.setState({deployedAddress: deployedAddress});
       const deployedTime = deployedContract.events.ContractCreation.returnValues['timestamp'];
       console.log(deployedTime);
 
-      this.setState({ contractAddress: deployedAddress });
+      // this.setState({ contractAddress: deployedAddress });
     } catch (err) {
       this.setState({ errorMessage: err.message });
       console.log(err);
     }
-    console.log(this.state.contractAddress);
-    this.setState({ loading: false });
-    Router.pushRoute(`/campaigns/${this.state.contractAddress}`);
+
+    Router.pushRoute(`/campaigns/${this.state.deployedAddress}`);
   };
 
 

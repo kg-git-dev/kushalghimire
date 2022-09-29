@@ -28,9 +28,9 @@ class CampaignShow extends Component {
     const summary = await campaign.methods.getSummary().call();
     // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
 
-    const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`);
-    const initializationDate = etherscan.data.result[0].timeStamp;
-    const initializationTime = new Date(initializationDate * 1000).toLocaleString("en-US")
+    // const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`);
+    // const initializationDate = etherscan.data.result[0].timeStamp;
+    const initializationTime = new Date(props.deployedTime * 1000).toLocaleString("en-US")
     // console.log(initializationTime);
 
     const requestCount = await campaign.methods.responseCounter().call();

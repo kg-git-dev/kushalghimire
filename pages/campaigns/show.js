@@ -9,6 +9,7 @@ import ContributeForm from "../../components/ContributeForm";
 import InstallmentIndicator from "../../components/installments/indicator";
 
 class CampaignShow extends Component {
+
   state = {
     loading: false,
     update_counter: '',
@@ -19,18 +20,28 @@ class CampaignShow extends Component {
     open: false,
   }
 
+
   static async getInitialProps(props) {
     const campaign = Campaign(props.query.address);
+
     const etherscan_api = 'U3VC9K7EK1YQUZD9XZUUUW3DQV3P29HKC2'
     const endpoint = "https://api-rinkeby.etherscan.io/api"
 
+    const initializationTime = await axios
+    .get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`)
+    .then(res => {
+      const { result } = res.data;
+      console.log(result);
+      if (result[0] != undefined){
+        const initializationTime = new Date(result[0].timeStamp * 1000).toLocaleString("en-US");
+        return initializationTime;
+      }else{
+        Router.pushRoute(`/campaigns/${props.query.address}`);
+      }
+    });
+
     const summary = await campaign.methods.getSummary().call();
     // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
-
-    const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`);
-    const initializationDate = etherscan.data.result[0].timeStamp;
-    const initializationTime = new Date(initializationDate * 1000).toLocaleString("en-US")
-    // console.log(initializationTime);
 
     const requestCount = await campaign.methods.responseCounter().call();
     // console.log(requestCount);
@@ -312,7 +323,7 @@ class CampaignShow extends Component {
               <Segment>
                 <Statistic>
                   {<Statistic.Value>{web3.utils.fromWei(remainingPayment, "gwei")}</Statistic.Value>}
-                  <Statistic.Label>Remaining Balance<br />(PAYABLE)</Statistic.Label>
+                  <Statistic.Label>Remaining Balance <br />(PAYABLE)</Statistic.Label>
                 </Statistic>
               </Segment>
             </Grid.Column>
@@ -354,7 +365,7 @@ class CampaignShow extends Component {
               </Segment>
                 <div>
                   <Progress value={Number(responseCounter) > Number(update_counter) ? responseCounter : update_counter} total='6' progress='ratio' indicating success={completed_contract} error={broken_contract} />
-                  <div class='makePaymentButton'>
+                  <div className='makePaymentButton'>
                     <Button.Group>
                       <Button disabled={loading} negative onClick={responseCounter == 6 || skipCounter == 2 ? this.setModalOn : this.skipPayment}>Skip Payment</Button>
 
