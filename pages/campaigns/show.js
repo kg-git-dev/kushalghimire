@@ -28,17 +28,17 @@ class CampaignShow extends Component {
     const endpoint = "https://api-rinkeby.etherscan.io/api"
 
     const initializationTime = await axios
-    .get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`)
-    .then(res => {
-      const { result } = res.data;
-      console.log(result);
-      if (result[0] != undefined){
-        const initializationTime = new Date(result[0].timeStamp * 1000).toLocaleString("en-US");
-        return initializationTime;
-      }else{
-        Router.pushRoute(`/campaigns/${props.query.address}`);
-      }
-    });
+      .get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`)
+      .then(res => {
+        const { result } = res.data;
+        console.log(result);
+        if (result[0] != undefined) {
+          const initializationTime = new Date(result[0].timeStamp * 1000).toLocaleString("en-US");
+          return initializationTime;
+        } else {
+          Router.pushRoute(`/campaigns/${props.query.address}`);
+        }
+      });
 
     const summary = await campaign.methods.getSummary().call();
     // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
@@ -121,9 +121,9 @@ class CampaignShow extends Component {
   paymentProgressSwitch(paymentProgress) {
     switch (paymentProgress) {
       case 'makePayment':
-        return `making payment of ${this.props.nextPayment}`
+        return `MAKING INSTALLMENT PAYMENT OF ${this.props.nextPayment.slice(0, -9)}`
       case 'skipPayment':
-        return 'skipping payment'
+        return `SKIPPING PAYMENT ${this.props.skipCounter + '1'} of 2`
       default:
         return '';
     }
@@ -158,24 +158,6 @@ class CampaignShow extends Component {
         //   "Address of person who currently holds the lease.",
         style: { overflowWrap: "anywhere" },
       },
-      // {
-      //   header: responseCounter,
-      //   meta: "Total number of installments completed",
-      //   description:
-      //     "Installment counter out of 6.",
-      // },
-      // {
-      //   header: skipCounter,
-      //   meta: "Number of installments skipped",
-      //   description:
-      //     "Total installment skipped. Maximum of 2. 3 missed installment means repossesion.",
-      // },
-      // {
-      //   header: web3.utils.fromWei(remainingPayment, "ether"),
-      //   meta: "Value of remaining contract balance",
-      //   description:
-      //     "the value auto corrects if any installment is missed to clear the sum.",
-      // },
     ];
 
     return <Card.Group items={items} />;
@@ -183,7 +165,7 @@ class CampaignShow extends Component {
 
   makePayment = async () => {
     const campaign = Campaign(this.props.address);
-    this.setState({ loading: true, makePayment: 'makePayment' });
+    this.setState({ loading: true, makePayment: 'makePayment', errorMessage: '' });
 
     try {
       const accounts = await web3.eth.getAccounts();
@@ -193,17 +175,17 @@ class CampaignShow extends Component {
         value: nextPayment
       });
     } catch (err) {
-      this.setState({ errorMessage: err.message });
-      console.log(err);
+      this.setState({ loading: false, errorMessage: err.message });
     }
-    this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
-    // Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ loading: false }));
-    window.location.reload();
 
+    if(!this.state.errorMessage) {
+      this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
+      window.location.reload();
+    }
   }
 
   skipPayment = async () => {
-    this.setState({ loading: true, makePayment: 'skipPayment' });
+    this.setState({ loading: true, makePayment: 'skipPayment',  errorMessage: ''  });
 
     try {
       const campaign = Campaign(this.props.address);
@@ -212,14 +194,13 @@ class CampaignShow extends Component {
         from: accounts[0],
       });
     } catch (err) {
-      this.setState({ errorMessage: err.message });
-      console.log(err);
+      this.setState({loading: false, errorMessage: err.message });
     }
-    this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
-    // Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ loading: false }));
-    window.location.reload();
-    
 
+    if(!this.state.errorMessage) {
+      this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
+      window.location.reload();
+    }
 
   }
 
@@ -249,7 +230,7 @@ class CampaignShow extends Component {
   }
 
   render() {
-    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment } = this.state;
+    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment, errorMessage } = this.state;
 
     const {
       leasedBy,
@@ -311,7 +292,7 @@ class CampaignShow extends Component {
           <Grid.Row >
             <Grid.Column width={4} textAlign='center'>
               <Segment>
-                <Statistic >
+                <Statistic color={leaseOwner ? 'green': ''}>
                   <Statistic.Value text>
                     {repossesedStatus ? ('SENT TO AUCTION') : leaseOwner ? ('OWNERSHIP TRANSFERED') : <div>LEASE<br />ACTIVE</div>}
                   </Statistic.Value>
@@ -345,8 +326,7 @@ class CampaignShow extends Component {
                   </Statistic>
                   <Statistic>
                     <Statistic.Value>
-                      <Icon name='exclamation triangle' color="green" size="small" fitted />{skipCounter < 3 ? (2 - skipCounter) ? repossesedStatus : '0' : '0'}
-
+                      <Icon name='exclamation triangle' color="green" size="small" fitted />{responseCounter == 0 ? 2 : 2 - skipCounter}
                     </Statistic.Value>
                     <Statistic.Label>Available<br />Skips</Statistic.Label>
                   </Statistic>
@@ -357,7 +337,7 @@ class CampaignShow extends Component {
           </Grid.Row>
           <Grid.Row >
             <Grid.Column width={8} textAlign='center'>
-              {repossesedStatus ? <div><Segment><p><b>THESE LEASE HAS BEEN REPOSSESED AND MADE AVAILABLE ON AUCTION</b></p><p>You can check auction list here: <a href="kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : leaseOwner ? <div><Segment><p>Installment plan successfuly completed and ownership transfered to leasee.</p></Segment></div> : <div><Segment>
+              {repossesedStatus ? <div><Segment><p><b>THESE LEASE HAS BEEN REPOSSESED AND MADE AVAILABLE ON AUCTION</b></p><p>You can check auction list here: <a href="kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : leaseOwner ? <div><Segment><p><h2>Installment plan successfuly completed and ownership transfered to leasee.</h2></p></Segment></div> : <div><Segment>
                 <Statistic>
                   <Statistic.Value>{web3.utils.fromWei(nextPayment, "gwei")}</Statistic.Value>
                   <Statistic.Label>Next Installment</Statistic.Label>
@@ -382,9 +362,16 @@ class CampaignShow extends Component {
                         <Message.Header>{this.paymentProgressSwitch(makePayment)} </Message.Header>
                       </Message.Content>
                     </Message>
+
+
+                    <Message negative hidden={!errorMessage}>
+                      <Message.Header>There has been an error</Message.Header>
+                      <p>{errorMessage}</p>
+                    </Message>
                   </div>
                 </div>
               </div>}
+
 
             </Grid.Column>
             <Grid.Column width={4}>
@@ -394,13 +381,13 @@ class CampaignShow extends Component {
               <Card>
                 <Card.Content>
                   <Card.Header>{initializationTime}</Card.Header>
-                  <Card.Meta>Downpayment of 0.0004 ether made and lease initialized.</Card.Meta>
+                  <Card.Meta>Downpayment of 40,000 made and lease initialized.</Card.Meta>
                   {/* <Card.Description>Downpayment of 0.0004 ether made and lease initialized.</Card.Description> */}
                 </Card.Content>
               </Card>
               <div>
-                {repossesedStatus ? <div><Card><Card.Content><Card.Header>{new Date(requests[requestCount - 1] * 1000).toLocaleString("en-US")}</Card.Header><Card.Description>Contract repossesed and made avaialble to auction.</Card.Description></Card.Content></Card><p></p></div> : leaseOwner ? <div><Card><Card.Content><Card.Header>{new Date(requests[requestCount - 1] * 1000).toLocaleString("en-US")}</Card.Header><Card.Description>Ownership transfered to Leasee after succesful completion.</Card.Description></Card.Content></Card><p></p></div> : ''} 
-                </div>
+                {repossesedStatus ? <div><Card><Card.Content><Card.Header>{new Date(requests[requestCount - 1] * 1000).toLocaleString("en-US")}</Card.Header><Card.Description>Contract repossesed and made avaialble to auction.</Card.Description></Card.Content></Card><p></p></div> : leaseOwner ? <div><Card><Card.Content><Card.Header>{new Date(requests[requestCount - 1] * 1000).toLocaleString("en-US")}</Card.Header><Card.Description>Ownership transfered to Leasee after succesful completion.</Card.Description></Card.Content></Card><p></p></div> : ''}
+              </div>
               <div>
                 {this.renderCards()}
               </div>
