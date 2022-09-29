@@ -106,6 +106,7 @@ class HomePage extends Component {
               <meta name="og-description" content="Welcome to kushalghimire.com" />
               <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
             </Helmet>
+            <Layout/>
           </>
         );
     }
