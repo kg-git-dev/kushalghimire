@@ -10,35 +10,51 @@ import InstallmentIndicator from "../../components/installments/indicator";
 
 class CampaignShow extends Component {
 
-  state = {
-    loading: false,
-    update_counter: '',
-    final_payment: false,
-    broken_contract: false,
-    makePayment: '',
-    errorMessage: '',
-    open: false,
+  constructor(props) {
+    super(props)
+    this.state = {
+      address: '',
+      initializationTime: 'LOADING',
+      loading: false,
+      update_counter: '',
+      final_payment: false,
+      broken_contract: false,
+      makePayment: '',
+      errorMessage: '',
+      open: false,
+    };
+  }
+
+  async componentDidMount() {
+    this.gettingApiData();
+  }
+
+  async componentDidUpdate(){   
+    if(this.state.initializationTime == 'LOADING'){
+      this.gettingApiData();
+    }
+  }
+
+  async gettingApiData() {
+    const etherscan_api = 'U3VC9K7EK1YQUZD9XZUUUW3DQV3P29HKC2';
+    const endpoint = "https://api-rinkeby.etherscan.io/api";
+    const initializationTime = await axios
+      .get(endpoint + `?module=account&action=txlistinternal&address=${this.props.address}&blocktype=blocks&apikey=${etherscan_api}`)
+      .then(res => {
+        const { result } = res.data;
+        if (result.length != 0) {
+          const initializationTime = new Date(result[0].timeStamp * 1000).toLocaleString("en-US");
+          return initializationTime;
+        } else {
+          return 'LOADING';
+        }
+      });
+    this.setState({ initializationTime: initializationTime })
   }
 
 
   static async getInitialProps(props) {
     const campaign = Campaign(props.query.address);
-
-    const etherscan_api = 'U3VC9K7EK1YQUZD9XZUUUW3DQV3P29HKC2'
-    const endpoint = "https://api-rinkeby.etherscan.io/api"
-
-    const initializationTime = await axios
-      .get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`)
-      .then(res => {
-        const { result } = res.data;
-        console.log(result);
-        if (result[0] != undefined) {
-          const initializationTime = new Date(result[0].timeStamp * 1000).toLocaleString("en-US");
-          return initializationTime;
-        } else {
-          Router.pushRoute(`/campaigns/${props.query.address}`);
-        }
-      });
 
     const summary = await campaign.methods.getSummary().call();
     // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
@@ -107,7 +123,6 @@ class CampaignShow extends Component {
       skipCounter: summary[3],
       remainingPayment: summary[4],
       nextPayment: nextPayment,
-      initializationTime: initializationTime,
       requests: requests,
       paymentStatus: paymentStatus,
       lastPayment: lastPayment,
@@ -123,7 +138,7 @@ class CampaignShow extends Component {
       case 'makePayment':
         return `MAKING INSTALLMENT PAYMENT OF ${this.props.nextPayment.slice(0, -9)}`
       case 'skipPayment':
-        return `SKIPPING PAYMENT ${this.props.skipCounter + '1'} of 2`
+        return `SKIPPING PAYMENT ${Number(this.props.skipCounter) + 1} of 2`
       default:
         return '';
     }
@@ -178,14 +193,14 @@ class CampaignShow extends Component {
       this.setState({ loading: false, errorMessage: err.message });
     }
 
-    if(!this.state.errorMessage) {
+    if (!this.state.errorMessage) {
       this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
       window.location.reload();
     }
   }
 
   skipPayment = async () => {
-    this.setState({ loading: true, makePayment: 'skipPayment',  errorMessage: ''  });
+    this.setState({ loading: true, makePayment: 'skipPayment', errorMessage: '' });
 
     try {
       const campaign = Campaign(this.props.address);
@@ -194,10 +209,10 @@ class CampaignShow extends Component {
         from: accounts[0],
       });
     } catch (err) {
-      this.setState({loading: false, errorMessage: err.message });
+      this.setState({ loading: false, errorMessage: err.message });
     }
 
-    if(!this.state.errorMessage) {
+    if (!this.state.errorMessage) {
       this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
       window.location.reload();
     }
@@ -230,7 +245,7 @@ class CampaignShow extends Component {
   }
 
   render() {
-    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment, errorMessage } = this.state;
+    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment, errorMessage, initializationTime } = this.state;
 
     const {
       leasedBy,
@@ -239,11 +254,11 @@ class CampaignShow extends Component {
       skipCounter,
       remainingPayment,
       nextPayment,
-      initializationTime,
       repossesedStatus,
       leaseOwner,
       requests,
       requestCount,
+
 
     } = this.props;
 
@@ -292,7 +307,7 @@ class CampaignShow extends Component {
           <Grid.Row >
             <Grid.Column width={4} textAlign='center'>
               <Segment>
-                <Statistic color={leaseOwner ? 'green': ''}>
+                <Statistic color={leaseOwner ? 'green' : repossesedStatus ? 'red' : 'black'}>
                   <Statistic.Value text>
                     {repossesedStatus ? ('SENT TO AUCTION') : leaseOwner ? ('OWNERSHIP TRANSFERED') : <div>LEASE<br />ACTIVE</div>}
                   </Statistic.Value>
@@ -326,7 +341,7 @@ class CampaignShow extends Component {
                   </Statistic>
                   <Statistic>
                     <Statistic.Value>
-                      <Icon name='exclamation triangle' color="green" size="small" fitted />{responseCounter == 0 ? 2 : 2 - skipCounter}
+                      <Icon name='exclamation triangle' color="green" size="small" fitted />{responseCounter == 0 ? 2 : skipCounter >= 2 ? '0' : 2 - skipCounter}
                     </Statistic.Value>
                     <Statistic.Label>Available<br />Skips</Statistic.Label>
                   </Statistic>
@@ -337,14 +352,14 @@ class CampaignShow extends Component {
           </Grid.Row>
           <Grid.Row >
             <Grid.Column width={8} textAlign='center'>
-              {repossesedStatus ? <div><Segment><p><b>THESE LEASE HAS BEEN REPOSSESED AND MADE AVAILABLE ON AUCTION</b></p><p>You can check auction list here: <a href="kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : leaseOwner ? <div><Segment><p><h2>Installment plan successfuly completed and ownership transfered to leasee.</h2></p></Segment></div> : <div><Segment>
+              {repossesedStatus ? <div><Segment><p><b>THESE LEASE HAS BEEN REPOSSESED AND MADE AVAILABLE ON AUCTION</b></p><p>You can check auction list here: <a href="https://www.kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : leaseOwner ? <div><Segment><p><h2>Installment plan successfuly completed and ownership transfered to leasee.</h2></p></Segment></div> : <div><Segment>
                 <Statistic>
                   <Statistic.Value>{web3.utils.fromWei(nextPayment, "gwei")}</Statistic.Value>
                   <Statistic.Label>Next Installment</Statistic.Label>
                 </Statistic>
               </Segment>
                 <div>
-                  <Progress value={Number(responseCounter) > Number(update_counter) ? responseCounter : update_counter} total='6' progress='ratio' indicating success={completed_contract} error={broken_contract} />
+                  <Progress value={Number(responseCounter) > Number(update_counter) ? Number(responseCounter) : Number(update_counter)} total='6' progress='ratio' indicating success={completed_contract} error={broken_contract} />
                   <div className='makePaymentButton'>
                     <Button.Group>
                       <Button disabled={loading} negative onClick={responseCounter == 6 || skipCounter == 2 ? this.setModalOn : this.skipPayment}>Skip Payment</Button>
