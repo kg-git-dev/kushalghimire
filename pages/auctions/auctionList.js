@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { Form, Button, Input, Message, Card } from "semantic-ui-react";
+import { Form, Button, Input, Message, Card, Header, Grid } from "semantic-ui-react";
 import Layout from "../../components/Layout";
 import factory from "../../ethereum/factory";
 import web3 from "../../ethereum/web3";
 import { Link } from "../../routes";
 import Campaign from "../../ethereum/campaign";
+import campaign from "../../ethereum/campaign";
 
 class AuctionList extends Component {
   static async getInitialProps() {
@@ -20,35 +21,61 @@ class AuctionList extends Component {
     );
 
     let auctionList = [];
-    
-    for (let i = 0; i < campaignLength; i++){
-      if(availableForAuction[i] == true){
-        auctionList.push(campaigns[i])
+
+
+    for (let i = 0; i < campaignLength; i++) {
+      if (availableForAuction[i] == true) {
+        const campaign = Campaign(campaigns[i]);;
+        const bidCounter = await campaign.methods.bidCounter().call();
+
+        if (bidCounter != 0) {
+          let highestBid = await campaign.methods.requests([bidCounter - 1]).call();
+          highestBid = highestBid[0];
+          auctionList.push({ id: campaigns[i], bidCounter: bidCounter, highestBid: highestBid })
+        } else {
+          auctionList.push({ id: campaigns[i], bidCounter: '0', highestBid: '0' })
+        }
       }
     }
+
     return { auctionList };
   }
 
+
+
   renderCampaigns() {
-    const items = this.props.auctionList.map((address) => {
+    const items = this.props.auctionList.map((auctionDetail, index) => {
       return {
-        header: address,
+        header: `${auctionDetail.bidCounter} Bids with highest Bid of ${auctionDetail.highestBid}`,
         description: (
-          <Link route={`/auctions/${address}`}>
+          <Link route={`/auctions/${auctionDetail.id}`}>
             <a>View Auction</a>
           </Link>
         ),
+        meta: auctionDetail.id,
         fluid: true,
       };
     });
     return <Card.Group items={items} />;
   }
+
   render() {
     return (
       <Layout>
         <div>
-          <h3>Open Auctions</h3>
-          {this.renderCampaigns()}
+          <br /><br />
+          <Grid>
+            <Grid.Row centered columns={2}>
+              <Grid.Column >
+                <Header as='h1' block>
+                  OPEN AUCTIONS:
+                </Header>
+                <br />
+                {this.renderCampaigns()}
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+
         </div>
       </Layout>
     );

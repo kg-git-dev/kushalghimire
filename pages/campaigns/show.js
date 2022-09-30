@@ -9,7 +9,6 @@ import ContributeForm from "../../components/ContributeForm";
 import InstallmentIndicator from "../../components/installments/indicator";
 
 class CampaignShow extends Component {
-
   constructor(props) {
     super(props)
     this.state = {
@@ -48,10 +47,8 @@ class CampaignShow extends Component {
     const requestCount = await campaign.methods.responseCounter().call();
 
     const repossesedStatus = await campaign.methods.repossesed(props.query.address).call();
-    console.log(repossesedStatus);
 
     const leaseOwner = await campaign.methods.owner(summary[0]).call();
-
 
     let nextPayment;
 
@@ -330,9 +327,10 @@ class CampaignShow extends Component {
               </Segment>
             </Grid.Column>
           </Grid.Row>
+
           <Grid.Row >
             <Grid.Column width={8} textAlign='center'>
-              {repossesedStatus ? <div><Segment><p><b>THESE LEASE HAS BEEN REPOSSESED AND MADE AVAILABLE ON AUCTION</b></p><p>You can check auction list here: <a href="https://www.kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : leaseOwner ? <div><Segment><p><h2>Installment plan successfuly completed and ownership transfered to leasee.</h2></p></Segment></div> : <div><Segment>
+              {repossesedStatus ? <div><Segment><p><b>THESE LEASE HAS BEEN REPOSSESED AND MADE AVAILABLE ON AUCTION</b></p><p>You can check open auction list here: <a href="https://www.kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : leaseOwner ? <div><Segment><p><b>INSTALLMENT PLAN SUCCESSFULLY COMPLETED AND OWNERSHIP TRANSFERED TO LEASEE.</b></p><p>You can check open auction list here: <a href="https://www.kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : <div><Segment>
                 <Statistic>
                   <Statistic.Value>{web3.utils.fromWei(nextPayment, "gwei")}</Statistic.Value>
                   <Statistic.Label>Next Installment</Statistic.Label>

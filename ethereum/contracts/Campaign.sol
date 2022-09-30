@@ -99,8 +99,9 @@ contract Campaign {
         paymentStatus.push(true);
         remainingPayment = remainingPayment - installment;  
         if(remainingPayment == 0) {
-            owner[manager] = true;
-        }    
+            owner[msg.sender] = true;
+        }   
+        ownerAddress = msg.sender; 
     }
 
     function skipPayment() restricted public{
@@ -113,7 +114,6 @@ contract Campaign {
         if(skipCounter >=3 || responseCounter ==6){
             repossesed[this] = true;
             availableForBid.push(this);
-
         }
     }
     
