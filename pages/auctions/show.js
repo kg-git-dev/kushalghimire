@@ -1,13 +1,10 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Card, Grid, Button, Segment, Rail, Image, Statistic, Icon, Progress, Message, Form } from "semantic-ui-react";
-import { Router } from "../../routes";
+import { Card, Grid, Button, Segment, Statistic, Icon, Message, Form } from "semantic-ui-react";
 import Layout from "../../components/Layout";
 import Campaign from "../../ethereum/campaign";
 import web3 from "../../ethereum/web3";
 import { ethers } from "ethers";
-import ContributeForm from "../../components/ContributeForm";
-import InstallmentIndicator from "../../components/installments/indicator";
 
 class CampaignShow extends Component {
   state = {
@@ -18,6 +15,7 @@ class CampaignShow extends Component {
     makePayment: '',
     errorMessage: '',
     bidAmount: '',
+    paymentType: '',
   }
 
   static async getInitialProps(props) {
@@ -28,17 +26,17 @@ class CampaignShow extends Component {
     const summary = await campaign.methods.getSummary().call();
     // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
 
-    // const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`);
-    // const initializationDate = etherscan.data.result[0].timeStamp;
-    const initializationTime = new Date(props.deployedTime * 1000).toLocaleString("en-US")
-    // console.log(initializationTime);
+    const etherscan = await axios.get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`);
+    const initializationDate = etherscan.data.result[0].timeStamp;
+    const initializationTime = new Date(initializationDate * 1000).toLocaleString("en-US")
+    console.log(initializationTime);
 
     const requestCount = await campaign.methods.responseCounter().call();
-    console.log(requestCount);
 
     const resoldStatus = await campaign.methods.resold().call();
     const repossesedStatus = await campaign.methods.repossesed(props.query.address).call();
-    const bidCounter = await campaign.methods.bidCounter().call()
+    let bidCounter = await campaign.methods.bidCounter().call()
+
     const recentBids = await Promise.all(
       Array(parseInt(bidCounter))
         .fill()
@@ -47,7 +45,7 @@ class CampaignShow extends Component {
         })
     );
 
-    console.log(recentBids);
+    // console.log(recentBids);
 
 
 
@@ -75,7 +73,7 @@ class CampaignShow extends Component {
 
 
     const paymentTime = new Date(requests[0] * 1000).toLocaleString("en-US")
-    console.log(paymentTime);
+    // console.log(paymentTime);
 
     const paymentStatus = await Promise.all(
       Array(parseInt(requestCount))
@@ -85,7 +83,17 @@ class CampaignShow extends Component {
         })
     );
 
-    console.log(paymentStatus[0]);
+    // console.log(paymentStatus[0]);
+
+    let bidWinnerDate = '';
+    if (bidCounter != 0) {
+      bidWinnerDate = await campaign.methods.bidWinnerDate().call();
+    }
+
+    let bidWinnerAddress = '';
+    if (resoldStatus) {
+      bidWinnerAddress = await campaign.methods.ownerAddress().call();
+    }
 
 
     return {
@@ -101,23 +109,35 @@ class CampaignShow extends Component {
       paymentStatus: paymentStatus,
       resoldStatus: resoldStatus,
       repossesedStatus: repossesedStatus,
-      recentBids: recentBids
+      recentBids: recentBids,
+      bidCounter: bidCounter,
+      requestCount: requestCount,
+      bidWinnerDate: bidWinnerDate,
+      bidWinnerAddress: bidWinnerAddress,
     };
 
   }
 
-  paymentProgressSwitch(paymentProgress) {
-    switch (paymentProgress) {
-      case 'makePayment':
-        return `making payment of ${this.props.nextPayment}`
-      case 'skipPayment':
-        return 'skipping payment'
-      case '1':
-        return 'Payment no.1';
-      case '2':
-        return 'Payment no.2'
-      case '3':
-        return 'Testing'
+  paymentProgressSwitch(paymentType) {
+    switch (paymentType) {
+      case 'bid':
+        return (
+          {
+            '0': `Making bid of ${Number(this.state.bidAmount).toLocaleString()}`,
+            '1': 'For demonstration, you can claim the latest bid as highest and win the auction required ownership of latest bid.'
+          })
+      case 'claim':
+        return (
+          {
+            '0': `Claiming highest bid of ${Number(web3.utils.fromWei((this.props.recentBids[this.props.bidCounter - 1][0]), 'gwei')).toLocaleString()}`,
+            '1': 'If you receive rinkeby ether in the future, it will most likely be the surplus transfer from a succesful auction.'
+          })
+      case 'buy':
+        return (
+          {
+            '0': 'Paying release fee of 60,000.',
+            '1': 'Thank you for going through the demonstration :).'
+          })
       default:
         return 'foo';
     }
@@ -127,7 +147,7 @@ class CampaignShow extends Component {
   renderRows() {
     const items = this.props.requests.map((request, index) => {
       return {
-        header: `${(this.props.paymentStatus[index]) ? 'PAYMENT OF ' + web3.utils.fromWei(this.props.nextPayment, "ether") + ' ETHER' : 'SKIPPED PAYMENT'}`,
+        header: `${(this.props.paymentStatus[index]) ? 'PAYMENT OF ' + web3.utils.fromWei(this.props.nextPayment, "gwei") + ' ETHER' : 'SKIPPED PAYMENT'}`,
         description: new Date(request * 1000).toLocaleString("en-US"),
         fluid: true,
       };
@@ -140,78 +160,107 @@ class CampaignShow extends Component {
       recentBids
     } = this.props;
 
-    const items = recentBids.map((request, index) => {
+    const reversedBids = recentBids.map(item => item).reverse();
+
+    const items = reversedBids.map((request, index) => {
       return {
         key: index,
-        header: `${web3.utils.fromWei(recentBids[index][0], 'gwei')}`,
+        header: `${Number(web3.utils.fromWei(reversedBids[index][0], 'gwei')).toLocaleString()}`,
         meta: "Bid made by following account",
-        description: recentBids[index][1],
+        description: reversedBids[index][1],
         style: { overflowWrap: "anywhere" },
       };
     });
     return <Card.Group items={items} />
   }
 
-  makePayment = async () => {
-    const campaign = Campaign(this.props.address);
-    console.log('here');
-
-    try {
-      const accounts = await web3.eth.getAccounts();
-      const userBid = '0.0006';
-      await campaign.methods
-        .makeBid(web3.utils.toWei(userBid, "ether"))
-        .send({ from: accounts[0] });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  skipPayment = async () => {
-    this.setState({ loading: true, makePayment: 'skipPayment' });
-
-    try {
-      const campaign = Campaign(this.props.address);
-      const accounts = await web3.eth.getAccounts();
-      await campaign.methods.skipPayment().send({
-        from: accounts[0],
-      });
-    } catch (err) {
-      this.setState({ errorMessage: err.message });
-      console.log(err);
-    }
-    this.setState({ update_counter: Number(this.props.responseCounter) + 1 });
-    Router.pushRoute(`/campaigns/${this.props.address}`);
-    this.setState({ loading: false })
+  handleChange = (event) => {
+    this.setState({ bidAmount: Number(event.target.value) })
 
   }
 
   handleSubmit = async () => {
     const campaign = Campaign(this.props.address);
-    this.setState({ bidAmount: this.state.bidAmount })
-    const decimals = 10;
-    const amount = ethers.utils.parseUnits(this.state.bidAmount, decimals)  ;
+    this.setState({ bidAmount: this.state.bidAmount, loading: true, errorMessage: '', paymentType: 'bid' })
+    const decimals = 9;
+    const amount = ethers.utils.parseUnits((this.state.bidAmount).toString(), decimals);
 
     try {
       const accounts = await web3.eth.getAccounts();
       await campaign.methods
         .makeBid(amount)
         .send({ from: accounts[0] });
+
     } catch (err) {
-      console.log(err);
+      this.setState({ errorMessage: err.message });
     }
-    window.location.reload();
+    if (!this.state.errorMessage) {
+      window.location.reload();
+    } else {
+      this.setState({ loading: false })
+    }
 
 
   }
 
-  handleChange = (event) => {
-    this.setState({ bidAmount: event.target.value })
 
+
+  claimBid = async () => {
+    const campaign = Campaign(this.props.address);
+    this.setState({ errorMessage: '', paymentType: 'claim' })
+    const accounts = await web3.eth.getAccounts();
+    if (accounts[0] == this.props.recentBids[this.props.bidCounter - 1][1]) {
+      this.setState({ loading: true })
+      try {
+        await campaign.methods
+          .highestBidTransfer(this.props.bidCounter - 1)
+          .send({
+            from: accounts[0],
+            value: this.props.recentBids[this.props.bidCounter - 1][0],
+          });
+
+      } catch (err) {
+        this.setState({ errorMessage: err.message });
+      }
+
+    } else {
+      this.setState({ errorMessage: 'Highest bid was not made by this account!!' });
+    }
+    if (!this.state.errorMessage) {
+      window.location.reload();
+    } else {
+      this.setState({ loading: false })
+    }
+  }
+
+  buyOutContract = async () => {
+    const campaign = Campaign(this.props.address);
+    this.setState({ errorMessage: '', paymentType: 'buy' })
+    const accounts = await web3.eth.getAccounts();
+    if (accounts[0] == this.props.recentBids[this.props.bidCounter - 1][1]) {
+      this.setState({ loading: true })
+      try {
+        await campaign.methods
+          .buyContract()
+          .send({
+            from: accounts[0],
+            value: web3.utils.toWei('0.00006', 'ether'),
+          });
+
+      } catch (err) {
+        this.setState({ errorMessage: err.message });
+      }
+
+    }
+    if (!this.state.errorMessage) {
+      window.location.reload();
+    } else {
+      this.setState({ loading: false })
+    }
   }
 
   render() {
-    const { completed_contract, broken_contract, loading, makePayment, update_counter, bidAmount } = this.state;
+    const { completed_contract, broken_contract, loading, makePayment, update_counter, bidAmount, errorMessage, paymentType } = this.state;
 
     const {
       leasedBy,
@@ -224,6 +273,11 @@ class CampaignShow extends Component {
       resoldStatus,
       repossesedStatus,
       requests,
+      recentBids,
+      bidCounter,
+      requestCount,
+      bidWinnerDate,
+      bidWinnerAddress,
 
     } = this.props;
 
@@ -246,18 +300,16 @@ class CampaignShow extends Component {
             <Grid.Column width={7} textAlign='center'>
               <Segment>
                 <Statistic>
-                  {/* <Statistic.Value>0.000133333333333333</Statistic.Value> */}
-                  <Statistic.Value>60000</Statistic.Value>
-                  <Statistic.Label>BUY OUT AMOUNT</Statistic.Label>
+                  <Statistic.Value>{bidCounter != 0 ? Number(web3.utils.fromWei(recentBids[bidCounter - 1][0], "gwei")).toLocaleString() : 'NO BIDS'}</Statistic.Value>
+                  <Statistic.Label>CURRENT HIGHEST BID</Statistic.Label>
                 </Statistic>
               </Segment>
             </Grid.Column>
             <Grid.Column width={5} textAlign='center'>
               <Segment>
                 <Statistic size="tiny">
-                  {/* <Statistic.Value>0.000133333333333333</Statistic.Value> */}
-                  <Statistic.Value>{web3.utils.fromWei(remainingPayment, "gwei")}</Statistic.Value>
-                  <Statistic.Label>CURRENT HIGHEST BID</Statistic.Label>
+                  <Statistic.Value>60,000</Statistic.Value>
+                  <Statistic.Label>BUYOUT AMOUNT</Statistic.Label>
                 </Statistic>
               </Segment>
             </Grid.Column>
@@ -266,37 +318,42 @@ class CampaignShow extends Component {
             <Grid.Column width={8} textAlign='center'>
               <Form onSubmit={this.handleSubmit}>
                 <Form.Input
-                  error={this.state.bidAmount < 45000}
+                  error={bidCounter != 0 ? ((this.state.bidAmount) <= web3.utils.fromWei(recentBids[bidCounter - 1][0], "gwei") || (this.state.bidAmount >= 60000)) : (this.state.bidAmount < web3.utils.fromWei(remainingPayment, "gwei") || this.state.bidAmount >= 60000)}
                   size='massive'
                   fluid
-                  // placeholder={`minimum bid of ${web3.utils.fromWei(requests[0][1], "gwei")} `}
+                  placeholder={`Bid more than ${bidCounter != 0 ? Number(web3.utils.fromWei(recentBids[bidCounter - 1][0], "gwei")).toLocaleString() + ' and less than 60,000' : Number(web3.utils.fromWei(remainingPayment, "gwei")).toLocaleString() + ' and less than 60,000'}  `}
                   id='form-input-first-name'
-                  defaultValue={bidAmount}
                   onChange={this.handleChange}
+                  type='number'
+                  disabled={loading || resoldStatus}
                 />
-                <div className='makePaymentButton'>
-                  <Button.Group>
-                    <Form.Button disabled={this.state.bidAmount < 45000} content="Submit Bid" color="orange"></Form.Button>
-                    <Button.Or />
-                    <Form.Button content="Claim Highest Bid" color='yellow'></Form.Button>
-                    <Button.Or />
-                    <Form.Button content="Buy out Contract" color='green'></Form.Button>
-                  </Button.Group>
-                </div>
               </Form>
 
-              <div>
-                <br /><br /><br />
+              <div><br /><br /></div>
 
-                <br />
+              <div className='makePaymentButton'>
+                <Button.Group>
+                  <Form.Button onClick={this.handleSubmit} disabled={loading ? true : bidCounter != 0 ? ((this.state.bidAmount) <= web3.utils.fromWei(recentBids[bidCounter - 1][0], "gwei") || (this.state.bidAmount >= 60000)) : (this.state.bidAmount < web3.utils.fromWei(remainingPayment, "gwei") || this.state.bidAmount >= 60000)} content="Submit Bid" color="orange"></Form.Button>
+                  <Button.Or />
+                  <Button onClick={this.claimBid} disabled={bidCounter == 0 || loading || resoldStatus} content="Claim Highest Bid" color='yellow'></Button>
+                  <Button.Or />
+                  <Button onClick={this.buyOutContract} disabled={loading || resoldStatus} content="Buy out Contract" color='green'></Button>
+                </Button.Group>
+              </div>
+
+              <div>
+                <br /><br />
                 <div>
-                  <Message hidden={!loading} icon>
+                  {loading ? <Message icon>
                     <Icon name='circle notched' loading />
                     <Message.Content>
-                      <Message.Header>{this.paymentProgressSwitch(makePayment)} {update_counter}</Message.Header>
-                      {this.paymentProgressSwitch(responseCounter)}
+                      <Message.Header>{this.paymentProgressSwitch(paymentType)[0]}</Message.Header>
+                      {this.paymentProgressSwitch(paymentType)[1]}
                     </Message.Content>
-                  </Message>
+                  </Message> : errorMessage ? <Message negative>
+                    <Message.Header>There has been an error!</Message.Header>
+                    <p>{errorMessage}</p>
+                  </Message> : ''}
                 </div>
               </div>
             </Grid.Column>
@@ -316,10 +373,21 @@ class CampaignShow extends Component {
               <Card>
                 <Card.Content>
                   <Card.Header>{initializationTime}</Card.Header>
-                  <Card.Meta>Downpayment of 0.0004 ether made and lease initialized.</Card.Meta>
-                  {/* <Card.Description>Downpayment of 0.0004 ether made and lease initialized.</Card.Description> */}
+                  <Card.Description>Downpayment of 40,000 made and lease initialized.</Card.Description>
                 </Card.Content>
               </Card>
+              <Card>
+                <Card.Content><Card.Header>{new Date(requests[requestCount - 1] * 1000).toLocaleString("en-US")}</Card.Header>
+                  <Card.Description>Contract repossesed and made avaialble to auction.</Card.Description>
+                </Card.Content>
+              </Card>
+              {resoldStatus ? <Card>
+                <Card.Content><Card.Header>{new Date(bidWinnerDate * 1000).toLocaleString("en-US")}</Card.Header>
+                  <Card.Meta>Auction won on the above date by the following account:</Card.Meta>
+                  <Card.Description><span style={ {overflowWrap: "anywhere" }}>{bidWinnerAddress}</span></Card.Description>                
+                </Card.Content>
+              </Card> : ''}
+
             </Grid.Column>
 
 

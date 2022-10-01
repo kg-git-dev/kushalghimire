@@ -6,7 +6,7 @@ contract CampaignFactory {
     event TokensSent(address deployedContract);
     event ContractCreation(uint256 timestamp);
 
-    function createCampaign() public payable  {
+    function createCampaign() public payable {
         require(msg.value == 0.00004 ether);
         address newCampaign = new Campaign(msg.sender, msg.value);
         deployedCampaigns.push(newCampaign);
@@ -22,32 +22,34 @@ contract CampaignFactory {
 
 contract Campaign {
     struct Request {
-        uint biddingPrice;
+        uint256 biddingPrice;
         address bidders;
     }
 
     Request[] public requests;
 
     struct NextInstallment {
-        uint nextInstallment;
+        uint256 nextInstallment;
     }
 
     NextInstallment[] public getNextInstallment;
 
-    uint[] public transactionDate;
+    uint256[] public transactionDate;
     bool[] public paymentStatus;
-    uint[] public lastPayment;
+    uint256[] public lastPayment;
 
-    uint public installment;
-    uint public responseCounter;
-    uint public skipCounter;
-    uint public remainingPayment = 0.00006 ether;
-    uint public auctionPrice;
-    uint i;
+    uint256 public bidWinnerDate;
+
+    uint256 public installment;
+    uint256 public responseCounter;
+    uint256 public skipCounter;
+    uint256 public remainingPayment = 0.00006 ether;
+    uint256 public auctionPrice;
+    uint256 i;
 
     address[] public winningBids;
     address public bidWinner;
-    uint public bidCounter;
+    uint256 public bidCounter;
 
     mapping(address => bool) public repossesed;
     mapping(address => bool) public owner;
@@ -66,105 +68,111 @@ contract Campaign {
         _;
     }
 
-    function Campaign(address creator, uint downPayment) public {
-        leasedBy = creator;  
-        downPayment = 0.0004 ether;
+    function Campaign(address creator, uint256 downPayment) public {
+        leasedBy = creator;
+        downPayment = 0.00004 ether;
         installment = downPayment;
     }
 
-    function getNextInstallment() public view returns (uint){
+    function getNextInstallment() public view returns (uint256) {
         NextInstallment memory installmentAmount = NextInstallment({
             nextInstallment: installmentAmount.nextInstallment
         });
-        if(responseCounter == 0) {
-            installmentAmount.nextInstallment = (remainingPayment/6);
+        if (responseCounter == 0) {
+            installmentAmount.nextInstallment = (remainingPayment / 6);
+        } else if (responseCounter == 1) {
+            installmentAmount.nextInstallment = (remainingPayment / 5);
+        } else {
+            installmentAmount.nextInstallment = (remainingPayment /
+                (6 - responseCounter));
         }
-        else if(responseCounter == 1){
-            installmentAmount.nextInstallment = (remainingPayment/5);
-        }
-        else{
-            installmentAmount.nextInstallment = (remainingPayment/(6 - responseCounter));
-        }return(
-            installmentAmount.nextInstallment
-        );
+        return (installmentAmount.nextInstallment);
     }
 
-    function makePayment() public restricted payable{
+    function makePayment() public payable restricted {
         require(!repossesed[this]);
         responseCounter++;
-        installment = remainingPayment/(7 - responseCounter);
+        installment = remainingPayment / (7 - responseCounter);
         require(msg.value == installment);
         lastPayment.push(msg.value);
         transactionDate.push(now);
         paymentStatus.push(true);
-        remainingPayment = remainingPayment - installment;  
-        if(remainingPayment == 0) {
+        remainingPayment = remainingPayment - installment;
+        if (remainingPayment == 0) {
             owner[msg.sender] = true;
-        }   
-        ownerAddress = msg.sender; 
+            ownerAddress = msg.sender;
+        }
     }
 
-    function skipPayment() restricted public{
+    function skipPayment() public restricted {
         require(!repossesed[this]);
         transactionDate.push(now);
         paymentStatus.push(false);
         lastPayment.push(0);
         responseCounter++;
         skipCounter++;
-        if(skipCounter >=3 || responseCounter ==6){
+        if (skipCounter >= 3 || responseCounter == 6) {
             repossesed[this] = true;
             availableForBid.push(this);
         }
     }
-    
-    function makeBid(uint userBid) public{
-        require(userBid >= remainingPayment);
+
+    function makeBid(uint256 userBid) public {
         bidCounter++;
         Request memory newRequest = Request({
             biddingPrice: userBid,
             bidders: msg.sender
         });
         requests.push(newRequest);
-        
     }
 
-    function buyContract() public payable{
+    function buyContract() public payable {
         require(repossesed[this]);
-        require(msg.value == 0.0006 ether);
+        require(msg.value == 0.00006 ether);
         manager.transfer(remainingPayment);
-        leasedBy.transfer(address(this).balance); 
-        owner[msg.sender] = true; 
-        ownerAddress = msg.sender;   
+        leasedBy.transfer(address(this).balance);
+        owner[msg.sender] = true;
+        ownerAddress = msg.sender;
         resold = true;
-    } 
+        bidWinnerDate = now;
+    }
 
-
-
-    function highestBidTransfer(uint bidNumber) public payable{
+    function highestBidTransfer(uint256 bidNumber) public payable {
         require(repossesed[this]);
         require(!resold);
         require(msg.sender == requests[bidNumber].bidders);
         require(msg.value == requests[bidNumber].biddingPrice);
         manager.transfer(remainingPayment);
         leasedBy.transfer(address(this).balance);
-        owner[msg.sender] = true; 
-        ownerAddress = msg.sender;   
+        owner[msg.sender] = true;
+        ownerAddress = msg.sender;
         resold = true;
+        bidWinnerDate = now;
     }
 
-
-    function getSummary() public view returns (
-      address, uint, uint, uint, uint, address, bool, uint
-      ) {
+    function getSummary()
+        public
+        view
+        returns (
+            address,
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            address,
+            bool,
+            uint256
+        )
+    {
         return (
-          leasedBy,
-          address(this).balance,
-          responseCounter,
-          skipCounter,
-          remainingPayment,
-          ownerAddress, 
-          resold,
-          bidCounter
+            leasedBy,
+            address(this).balance,
+            responseCounter,
+            skipCounter,
+            remainingPayment,
+            ownerAddress,
+            resold,
+            bidCounter
         );
     }
 

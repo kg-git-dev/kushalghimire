@@ -19,6 +19,7 @@ class CampaignShow extends Component {
       broken_contract: false,
       makePayment: '',
       errorMessage: '',
+      modalErrorMessage: '',
       open: false,
     };
   }
@@ -112,7 +113,7 @@ class CampaignShow extends Component {
   paymentProgressSwitch(paymentProgress) {
     switch (paymentProgress) {
       case 'makePayment':
-        return `MAKING INSTALLMENT PAYMENT OF ${this.props.nextPayment.slice(0, -9)}`
+        return `MAKING INSTALLMENT PAYMENT OF ${Number(this.props.nextPayment.slice(0, -9)).toLocaleString()}`
       case 'skipPayment':
         return `SKIPPING PAYMENT ${Number(this.props.skipCounter) + 1} of 2`
       default:
@@ -124,7 +125,7 @@ class CampaignShow extends Component {
   renderRows() {
     const items = this.props.requests.map((request, index) => {
       return {
-        header: `${(this.props.paymentStatus[index]) ? 'Payment of ' + web3.utils.fromWei(this.props.lastPayment[index], "gwei") + ' ' : 'SKIPPED PAYMENT'}`,
+        header: `${(this.props.paymentStatus[index]) ? 'Payment of ' + Number(web3.utils.fromWei(this.props.lastPayment[index], "gwei")).toLocaleString() + ' ' : 'SKIPPED PAYMENT'}`,
         description: new Date(request * 1000).toLocaleString("en-US"),
         fluid: true,
       };
@@ -196,7 +197,7 @@ class CampaignShow extends Component {
   }
 
   setModalOff = () => {
-    this.setState({ open: false, errorMessage: false })
+    this.setState({ open: false, errorMessage: false, modalErrorMessage: '' })
   }
 
   setModalOn = () => {
@@ -204,24 +205,27 @@ class CampaignShow extends Component {
   }
 
   skipPaymentModal = async () => {
-    this.setState({ final_payment: true })
+    this.setState({ final_payment: true, modalErrorMessage: '' })
     try {
       const campaign = Campaign(this.props.address);
       const accounts = await web3.eth.getAccounts();
       await campaign.methods.skipPayment().send({
         from: accounts[0],
       });
+
     } catch (err) {
-      this.setState({ errorMessage: err.message });
+      this.setState({ modalErrorMessage: err.message, final_payment: false });
       console.log(err);
     }
-    // Router.pushRoute(`/campaigns/${this.props.address}`).then(this.setState({ open: false, final_payment: false }));
-    window.location.reload();
+    if(!this.state.modalErrorMessage){
+      window.location.reload();
+    }
+
 
   }
 
   render() {
-    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment, errorMessage } = this.state;
+    const { completed_contract, broken_contract, loading, makePayment, update_counter, open, final_payment, errorMessage, modalErrorMessage } = this.state;
 
     const {
       leasedBy,
@@ -269,6 +273,10 @@ class CampaignShow extends Component {
               The lease has been repossesed due to non compliance with terms and conditions and will be set for auction.
             </Message.Content>
           </Message> : ''}
+          <Message negative hidden={!modalErrorMessage}>
+            <Message.Header>There has been an error</Message.Header>
+            <p>{modalErrorMessage}</p>
+          </Message>
           <Modal.Actions>
             {!this.state.final_payment ? <div><Button basic color='red' inverted onClick={this.setModalOff}>
               <Icon name='remove' /> No
@@ -295,7 +303,7 @@ class CampaignShow extends Component {
             <Grid.Column width={7} textAlign='center'>
               <Segment>
                 <Statistic>
-                  {<Statistic.Value>{web3.utils.fromWei(remainingPayment, "gwei")}</Statistic.Value>}
+                  {<Statistic.Value>{Number(web3.utils.fromWei(remainingPayment, "gwei")).toLocaleString()}</Statistic.Value>}
                   <Statistic.Label>Remaining Balance<br />(PAYABLE)</Statistic.Label>
                 </Statistic>
               </Segment>
@@ -332,7 +340,7 @@ class CampaignShow extends Component {
             <Grid.Column width={8} textAlign='center'>
               {repossesedStatus ? <div><Segment><p><b>THESE LEASE HAS BEEN REPOSSESED AND MADE AVAILABLE ON AUCTION</b></p><p>You can check open auction list here: <a href="https://www.kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : leaseOwner ? <div><Segment><p><b>INSTALLMENT PLAN SUCCESSFULLY COMPLETED AND OWNERSHIP TRANSFERED TO LEASEE.</b></p><p>You can check open auction list here: <a href="https://www.kushalghimire.com/auctions">AUCTION LIST</a></p></Segment></div> : <div><Segment>
                 <Statistic>
-                  <Statistic.Value>{web3.utils.fromWei(nextPayment, "gwei")}</Statistic.Value>
+                  <Statistic.Value>{Number(web3.utils.fromWei(nextPayment, "gwei")).toLocaleString()}</Statistic.Value>
                   <Statistic.Label>Next Installment</Statistic.Label>
                 </Statistic>
               </Segment>

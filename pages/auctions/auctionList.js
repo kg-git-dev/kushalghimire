@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Form, Button, Input, Message, Card, Header, Grid } from "semantic-ui-react";
+import { Card, Header, Grid } from "semantic-ui-react";
 import Layout from "../../components/Layout";
 import factory from "../../ethereum/factory";
-import web3 from "../../ethereum/web3";
 import { Link } from "../../routes";
 import Campaign from "../../ethereum/campaign";
-import campaign from "../../ethereum/campaign";
+import web3 from "../../ethereum/web3";
+
 
 class AuctionList extends Component {
   static async getInitialProps() {
@@ -46,7 +46,7 @@ class AuctionList extends Component {
   renderCampaigns() {
     const items = this.props.auctionList.map((auctionDetail, index) => {
       return {
-        header: `${auctionDetail.bidCounter} Bids with highest Bid of ${auctionDetail.highestBid}`,
+        header: `${auctionDetail.bidCounter} Bids with highest Bid of ${Number(web3.utils.fromWei(auctionDetail.highestBid, "Gwei")).toLocaleString()}`, 
         description: (
           <Link route={`/auctions/${auctionDetail.id}`}>
             <a>View Auction</a>
@@ -67,8 +67,8 @@ class AuctionList extends Component {
           <Grid>
             <Grid.Row centered columns={2}>
               <Grid.Column >
-                <Header as='h1' block>
-                  OPEN AUCTIONS:
+                <Header as='h1' block textAlign="center">
+                  OPEN AUCTIONS
                 </Header>
                 <br />
                 {this.renderCampaigns()}
