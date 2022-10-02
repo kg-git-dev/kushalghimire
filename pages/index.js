@@ -58,6 +58,14 @@ class HomePage extends Component {
                       <br /><br />
                     </Grid.Column>
                     <Grid.Column width={2}>
+                      <div>
+                        <div class="scroll-downs">
+                          <div class="mousey">
+                            <div class="scroller"></div>
+                          </div>
+                        </div>
+
+                      </div>
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>
@@ -106,7 +114,7 @@ class HomePage extends Component {
               <meta name="og-description" content="Welcome to kushalghimire.com" />
               <meta id="og-image" property="og:image" content="https://kushalghimire.vercel.app/kushal_profile_pic.png" />
             </Helmet>
-            <Layout/>
+            <Layout />
           </>
         );
     }
