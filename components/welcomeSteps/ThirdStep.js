@@ -37,7 +37,6 @@ class ThirdStep extends Component {
       // this.setState({ contractAddress: deployedAddress });
     } catch (err) {
       this.setState({ errorMessage: err.message });
-      console.log(err);
     }
 
     Router.pushRoute(`/campaigns/${this.state.deployedAddress}`);

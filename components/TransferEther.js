@@ -30,13 +30,12 @@ class TransferEther extends Component {
                 const receivedStatus = await compileDonation.methods.alreadyRecieved(accounts[0]).call();
                 this.setState({ alreadyReceived: receivedStatus })
             } catch (err) {
-                console.log(err.message);
+                this.setState({errorMessage: err.message})
             }
 
             if (!this.state.alreadyReceived) {
                 this.setState({ loading: true });
                 const subscriberData = this.props.subscriberName + ' from ' + this.props.subscriberIp;
-                console.log(subscriberData);
                 const owner = await compileDonation.methods.owner().call();
                 const myNonce = await web3.eth.getTransactionCount(owner);
                 const accounts = await web3.eth.getAccounts();
@@ -182,7 +181,7 @@ class TransferEther extends Component {
                                 <div>
                                     {this.state.errorMessage ?
                                         <div><p></p><Message negative>
-                                            <Message.Header>Please Select the Goerli Ethereum Network</Message.Header>
+                                            <Message.Header>Please Select the Goerli Test Network</Message.Header>
                                             <p>Since this is just a demonstration, we will not be using real money. Goerli is built specifically for testing purposes.</p>
                                         </Message></div> : ''}
                                 </div>
@@ -193,7 +192,7 @@ class TransferEther extends Component {
                             <Icon name='circle notched' loading />
                             <Message.Content>
                                 <Message.Header>Whoa! Is that a loading screen?</Message.Header>
-                                Every data alteration in the blockchain creates a new block with the modified data. This takes aboout 20 seconds and costs real money.
+                                Transaction in blockchain costs real money and takes about 20 seconds to process limiting it's use cases. After loading is done please check your metamask account to find 0.001 Goerli ether. 
                             </Message.Content>
                         </Message> : ''}
                         <Modal.Actions>

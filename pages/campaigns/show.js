@@ -215,7 +215,6 @@ class CampaignShow extends Component {
 
     } catch (err) {
       this.setState({ modalErrorMessage: err.message, final_payment: false });
-      console.log(err);
     }
     if(!this.state.modalErrorMessage){
       window.location.reload();
@@ -348,7 +347,7 @@ class CampaignShow extends Component {
                   <Progress value={Number(responseCounter) > Number(update_counter) ? Number(responseCounter) : Number(update_counter)} total='6' progress='ratio' indicating success={completed_contract} error={broken_contract} />
                   <div className='makePaymentButton'>
                     <Button.Group>
-                      <Button disabled={loading || responseCounter == 0} negative onClick={responseCounter == 6 || skipCounter == 2 ? this.setModalOn : this.skipPayment}>Skip Payment</Button>
+                      <Button disabled={loading || responseCounter == 0} negative onClick={responseCounter == 5 || skipCounter == 2 ? this.setModalOn : this.skipPayment}>Skip Payment</Button>
 
                       {/* <Button disabled={loading} negative onClick={responseCounter == 6 ? this.skipPaymentModal ? skipCounter == 2 : this.skipPaymentModal : this.skipPayment}>Skip Payment</Button> */}
                       <Button.Or />

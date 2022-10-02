@@ -75,7 +75,6 @@ class SecondStep extends Component {
     // Assigning the right amount of gas
     tx.gas = await web3.eth.estimateGas(tx);
 
-    console.log('here');
 
     // Sending the transaction to the network
     const receipt = await web3.eth
@@ -148,7 +147,7 @@ class SecondStep extends Component {
                   <div className="header">Key Details: </div>
                   <ul>
                     <li>The contract can be initialized by making a downpayment of 40,000 Gwei (0.00004 ether). The deposit is non refundable and paid directly to KG Motors.</li>
-                    <li>The remaining balance to be paid in between 4 to 6 installments.</li>
+                    <li>The remaining balance of 60,000 to be paid in between 4 to 6 installments.</li>
                     <li>Lease Owner is permitted a maximum of 2 missed payments. Third miss results in forfeiture.</li>
                     <li>Payment of first installment is mandatory.</li>
                     <li>Missing the final payment results in forfeiture.</li>
