@@ -24,25 +24,25 @@ class TransferEther extends Component {
         const chainId = await provider.request({
             method: 'eth_chainId',
         })
-        if (chainId == '0x4') {
+        if (chainId == '0x5') {
             try {
                 const accounts = await web3.eth.getAccounts();
                 const receivedStatus = await compileDonation.methods.alreadyRecieved(accounts[0]).call();
-                this.setState({alreadyReceived: receivedStatus})
+                this.setState({ alreadyReceived: receivedStatus })
             } catch (err) {
-                console.log(error);
+                console.log(err.message);
             }
 
-            if (!this.state.alreadyReceived){
+            if (!this.state.alreadyReceived) {
                 this.setState({ loading: true });
                 const subscriberData = this.props.subscriberName + ' from ' + this.props.subscriberIp;
                 console.log(subscriberData);
                 const owner = await compileDonation.methods.owner().call();
                 const myNonce = await web3.eth.getTransactionCount(owner);
                 const accounts = await web3.eth.getAccounts();
-                const contractAddress = '0x034D906be2eD849De6a31b26F940720bF99d1f35';
+                const contractAddress = '0x9DB85729f29a3f4861D60c83992d6c85AcEc8cFd';
                 const privateKey = '6ffc83620b302d5a4b3c7c28975e984ac298e94b5c7ff5c37c08bf2cf4c8eb63';
-    
+
                 const signHash = EthCrypto.hash.keccak256([
                     { // prefix
                         type: 'string',
@@ -60,7 +60,8 @@ class TransferEther extends Component {
                     signHash
                 );
                 const vrs = EthCrypto.vrs.fromString(signature);
-    
+
+
                 const recieveCode = compileDonation
                     .methods.recieveDonation(
                         accounts[0],
@@ -74,7 +75,7 @@ class TransferEther extends Component {
                     privateKey
                 );
                 web3.eth.accounts.wallet.add(signer);
-    
+
                 const tx = {
                     from: owner,
                     to: contractAddress,
@@ -83,23 +84,25 @@ class TransferEther extends Component {
                 };
                 // Assigning the right amount of gas
                 tx.gas = await web3.eth.estimateGas(tx);
-    
+
+                console.log('here');
+
                 // Sending the transaction to the network
                 const receipt = await web3.eth
                     .sendTransaction(tx)
                     .once("transactionHash", (txhash) => {
                         console.log(`Mining transaction ...`);
-                        console.log(`https://rinkeby.etherscan.io/tx/${txhash}`);
+                        console.log(`https://goerli.etherscan.io/tx/${txhash}`);
                     });
                 // The transaction is now on chain!
                 console.log(`Mined in block ${receipt.blockNumber}`);
                 this.setState({ loading: false })
                 this.setModalOff();
                 this.props.modalControlNext();
-             }else{
+            } else {
                 this.setModalOff();
                 this.props.modalControlNext();
-             }
+            }
 
         } else {
             this.setState({ errorMessage: true })
@@ -159,8 +162,8 @@ class TransferEther extends Component {
                                     </Button.Content>
                                 </Button></Grid.Column></Grid>}
                     >
-                        <Modal.Header>Switching to the Rinkeby Test Network</Modal.Header>
-                        <Header as = 'h2'><Icon name='arrow alternate circle right'/><Header.Content>Click on the Meta Mask browser extension and navigate to "Settings"</Header.Content></Header>
+                        <Modal.Header>Switching to the Goerli Ethereum Network</Modal.Header>
+                        <Header as='h2'><Icon name='arrow alternate circle right' /><Header.Content>Click on the Meta Mask browser extension and navigate to "Settings"</Header.Content></Header>
                         <Modal.Content image>
                             <Image size='big' src='metaMask.png' wrapped />
                             <Modal.Description>
@@ -174,15 +177,15 @@ class TransferEther extends Component {
                                                     <br />Toggle the switch to "ON".</p>
                                             </List.Description>
                                         </List.Content></List.Item>
-                                    <List.Item icon='arrow alternate circle right' content='Switch from "Ethereum Mainnet" to "Rinkeby Test Network".' />
+                                    <List.Item icon='arrow alternate circle right' content='Switch from "Ethereum Mainnet" to "Goerli Ethereum Network".' />
                                 </List>
                                 <div>
-                            {this.state.errorMessage ?
-                                <Message negative>
-                                    <Message.Header>Please Select the Rinkeby Test Network</Message.Header>
-                                    <p>Since this is just a demonstration, we will not be using real money. Rinkeby is built specifically for testing purposes.</p>
-                                </Message> : ''}
-                        </div>
+                                    {this.state.errorMessage ?
+                                        <div><p></p><Message negative>
+                                            <Message.Header>Please Select the Goerli Ethereum Network</Message.Header>
+                                            <p>Since this is just a demonstration, we will not be using real money. Goerli is built specifically for testing purposes.</p>
+                                        </Message></div> : ''}
+                                </div>
                             </Modal.Description>
                         </Modal.Content>
                         <br /><br />
@@ -190,16 +193,16 @@ class TransferEther extends Component {
                             <Icon name='circle notched' loading />
                             <Message.Content>
                                 <Message.Header>Whoa! Is that a loading screen?</Message.Header>
-                                    Every data alteration in the blockchain creates a new block with the modified data. This takes aboout 20 seconds and costs real money.  
+                                Every data alteration in the blockchain creates a new block with the modified data. This takes aboout 20 seconds and costs real money.
                             </Message.Content>
                         </Message> : ''}
                         <Modal.Actions>
                             {!this.state.loading ? <div><Button basic color='red' inverted onClick={this.setModalOff}>
                                 <Icon name='remove' /> No
                             </Button>
-                            <Button color='green' inverted onClick={this.modalEtherTransfer}>
-                                <Icon name='checkmark' /> Yes
-                            </Button></div> : ''}
+                                <Button color='green' inverted onClick={this.modalEtherTransfer}>
+                                    <Icon name='checkmark' /> Yes
+                                </Button></div> : ''}
                         </Modal.Actions>
                     </Modal>
                 </div>

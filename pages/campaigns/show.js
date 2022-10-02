@@ -27,7 +27,7 @@ class CampaignShow extends Component {
   static async getInitialProps(props) {
 
     const etherscan_api = 'U3VC9K7EK1YQUZD9XZUUUW3DQV3P29HKC2';
-    const endpoint = "https://api-rinkeby.etherscan.io/api";
+    const endpoint = "https://api-goerli.etherscan.io/api";
     const initializationTime = await axios
       .get(endpoint + `?module=account&action=txlistinternal&address=${props.query.address}&blocktype=blocks&apikey=${etherscan_api}`)
       .then(res => {
@@ -348,7 +348,7 @@ class CampaignShow extends Component {
                   <Progress value={Number(responseCounter) > Number(update_counter) ? Number(responseCounter) : Number(update_counter)} total='6' progress='ratio' indicating success={completed_contract} error={broken_contract} />
                   <div className='makePaymentButton'>
                     <Button.Group>
-                      <Button disabled={loading} negative onClick={responseCounter == 6 || skipCounter == 2 ? this.setModalOn : this.skipPayment}>Skip Payment</Button>
+                      <Button disabled={loading || responseCounter == 0} negative onClick={responseCounter == 6 || skipCounter == 2 ? this.setModalOn : this.skipPayment}>Skip Payment</Button>
 
                       {/* <Button disabled={loading} negative onClick={responseCounter == 6 ? this.skipPaymentModal ? skipCounter == 2 : this.skipPaymentModal : this.skipPayment}>Skip Payment</Button> */}
                       <Button.Or />

@@ -76,7 +76,7 @@ class Tutorial extends Component {
             //     .sendTransaction(tx)
             //     .once("transactionHash", (txhash) => {
             //         console.log(`Mining transaction ...`);
-            //         console.log(`https://rinkeby.etherscan.io/tx/${txhash}`);
+            //         console.log(`https://goerli.etherscan.io/tx/${txhash}`);
             //     });
             // // The transaction is now on chain!
             // console.log(`Mined in block ${receipt.blockNumber}`);
@@ -245,7 +245,7 @@ class Tutorial extends Component {
                                                 <div className="content">
                                                     <div className="header">Fourth Step</div>
                                                     <div className="description">Scroll a little below to find an option called 'Show test networks'. Toggle to 'on'.
-                                                        <br />I have conditionally required the application to only authorize rinkeby transactions since the application will work fine on the main Ether network as well.
+                                                        <br />I have conditionally required the application to only authorize Goerli transactions since the application will work fine on the main Ether network as well.
                                                     </div>
                                                 </div></div></div>
                                         <div>
@@ -284,7 +284,7 @@ class Tutorial extends Component {
                                             <div className="item">
                                                 <div className="content">
                                                     <div className="header">Second Step</div>
-                                                    <div className="description">Click on 'Ethereum Mainnet'. There will be an option called 'Rinkeby Test Network'. </div>
+                                                    <div className="description">Click on 'Ethereum Mainnet'. There will be an option called 'Goerli Ethereum Network'. </div>
                                                 </div></div></div>
                                         <div>
                                         <Button onClick={this.prevStepMeta} content='Back' icon='left arrow' labelPosition='left' />

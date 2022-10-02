@@ -75,12 +75,14 @@ class SecondStep extends Component {
     // Assigning the right amount of gas
     tx.gas = await web3.eth.estimateGas(tx);
 
+    console.log('here');
+
     // Sending the transaction to the network
     const receipt = await web3.eth
       .sendTransaction(tx)
       .once("transactionHash", (txhash) => {
         console.log(`Mining transaction ...`);
-        console.log(`https://rinkeby.etherscan.io/tx/${txhash}`);
+        console.log(`https://goerli.etherscan.io/tx/${txhash}`);
       });
     // The transaction is now on chain!
     console.log(`Mined in block ${receipt.blockNumber}`);
@@ -137,6 +139,7 @@ class SecondStep extends Component {
             <div>
               <div>
                 <br/><p>KG Motors is proud to announce our partnership with Tesla Cyber Truck. As authorized sellers, we are offering a specialized financing package of 40% downpayment and 4 to 6 even payments.</p>
+                <p>Signees will make a downpayment of 40,000 to initialize the lease and make total payment of 60,000 over the next 6 months.</p>
                 <p>In lieu of transparency, missing more than 2 or the final payment will result in the car being repossesed and sold in auction.</p>
                 <p>Signees are requested to review the terms carefully since the path will be executed exactly as defined in the contract and cannot be altered or intervened with.</p>
                </div>
@@ -144,14 +147,15 @@ class SecondStep extends Component {
                 <div className="item">
                   <div className="header">Key Details: </div>
                   <ul>
-                    <li>The contract can be initialized by making a downpayment of 0.00004 Rinkeby Test Ether. The deposit is non refundable and paid directly to KG Motors.</li>
+                    <li>The contract can be initialized by making a downpayment of 40,000 Gwei (0.00004 ether). The deposit is non refundable and paid directly to KG Motors.</li>
                     <li>The remaining balance to be paid in between 4 to 6 installments.</li>
                     <li>Lease Owner is permitted a maximum of 2 missed payments. Third miss results in forfeiture.</li>
+                    <li>Payment of first installment is mandatory.</li>
                     <li>Missing the final payment results in forfeiture.</li>
                     <li>Forfeited vehicles to be offered in auction with the revenue from sale transfered to KG motors for balance owed. Surplus balance transfered to forfeiting party.</li>
                     <li>In auction, bids have to exceed prior bids to be registered.</li>
                     <li>In auction, contracts can be bought out if matched the buy out clause. </li>
-                    <li>In order to interact with the ethereum blockchain network, an initializing balance of 0.01 Rinkeby Ether will be transfered into your account.</li>
+                    <li>In order to interact with the ethereum blockchain network, an initializing balance of 0.01 Goerli Ethereum will be transfered into your account.</li>
                     <li>A user can request ether once with one wallet key.</li>
                   </ul>
                 </div>

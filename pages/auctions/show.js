@@ -21,7 +21,7 @@ class CampaignShow extends Component {
   static async getInitialProps(props) {
     const campaign = Campaign(props.query.address);
     const etherscan_api = 'U3VC9K7EK1YQUZD9XZUUUW3DQV3P29HKC2'
-    const endpoint = "https://api-rinkeby.etherscan.io/api"
+    const endpoint = "https://api-goerli.etherscan.io/api"
 
     const summary = await campaign.methods.getSummary().call();
     // const repossesed = await campaign.methods.repossesed(`${props.query.address}`).call();
@@ -130,7 +130,7 @@ class CampaignShow extends Component {
         return (
           {
             '0': `Claiming highest bid of ${Number(web3.utils.fromWei((this.props.recentBids[this.props.bidCounter - 1][0]), 'gwei')).toLocaleString()}`,
-            '1': 'If you receive rinkeby ether in the future, it will most likely be the surplus transfer from a succesful auction.'
+            '1': 'If you receive Goerli ether in the future, it will most likely be the surplus transfer from a succesful auction.'
           })
       case 'buy':
         return (
