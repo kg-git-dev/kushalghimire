@@ -9,7 +9,7 @@ const Web3 = require('web3');
 
 const provider = new HDWalletProvider(
     'scare mother derive fragile defense network aim fence spatial ankle odor vendor',
-    'https://rinkeby.infura.io/v3/e4b5fe045fea4d79afa58aaf33f46c6c'
+    'https://goerli.infura.io/v3/e4b5fe045fea4d79afa58aaf33f46c6c'
   );
 
 // Private key to use to sign the transactions
