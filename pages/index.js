@@ -8,9 +8,10 @@ import { Helmet } from 'react-helmet';
 class HomePage extends Component {
   constructor(props) {
     super(props);
-    this.state = { step: '' };
+    this.state = { step: '', mouse: '1'};
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
+
   componentDidMount() {
     this.updateWindowDimensions();
     window.addEventListener('resize', this.updateWindowDimensions);
@@ -28,8 +29,12 @@ class HomePage extends Component {
     }
   }
 
+  removeMouse = () => {
+    this.setState({mouse: '2'});
+  }
+
   render() {
-    const { step } = this.state;
+    const { step, mouse } = this.state;
 
 
     switch (step) {
@@ -54,18 +59,16 @@ class HomePage extends Component {
                     </Grid.Column>
                     <Grid.Column width={12}>
                       <br /><br /><br />
-                      <WelcomeMultiStep deviceType="desktop" />
+                      <WelcomeMultiStep deviceType="desktop"
+                        removeMouse={this.removeMouse} />
                       <br /><br />
                     </Grid.Column>
                     <Grid.Column width={2}>
-                      <div>
-                        <div class="scroll-downs">
-                          <div class="mousey">
-                            <div class="scroller"></div>
-                          </div>
+                      {mouse == '1' ? <div class="scroll-downs">
+                        <div class="mousey">
+                          <div class="scroller"></div>
                         </div>
-
-                      </div>
+                      </div> : ''}
                     </Grid.Column>
                   </Grid.Row>
                 </Grid>

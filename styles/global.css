@@ -233,13 +233,11 @@
 
 
 .scroll-downs {
-  /* position: absolute;
+  position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  left: 0; */
-  position: relative;
-  top: 150vh;
+  left: 0;
   margin: auto;
   
   width :34px;
@@ -258,7 +256,7 @@
   width: 3px;
   height: 10px;
   border-radius: 25%;
-  background-color:navy;
+  background-color: navy;
   animation-name: scroll;
   animation-duration: 2.2s;
   animation-timing-function: cubic-bezier(.15,.41,.69,.94);

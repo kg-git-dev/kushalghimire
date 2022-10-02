@@ -25,6 +25,7 @@ class WelcomeMultiStep extends React.Component {
     this.setState({
       step : step + 1
     })
+    this.props.removeMouse();
   }
  
   handleChange = input => event => {
