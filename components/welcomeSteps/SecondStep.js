@@ -118,6 +118,7 @@ class SecondStep extends Component {
       <div>
         <Grid.Column>
           <Segment>
+
             <div>
               <h1 className="ui header">
                 <p> Hello <span style={{ color: '#4183c4' }}>{subscriberName ? subscriberName : 'Kind Stranger'}</span> from {subscriberCountry}!! <Flag name={subscriberCountry.toLowerCase()} />

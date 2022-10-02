@@ -61,6 +61,7 @@ class WelcomeMultiStep extends React.Component {
               <div>
                 <Indicator 
                       currentStep="second"
+                      deviceType={deviceType}
                       />
                 <br />
                 <SecondStep
@@ -76,6 +77,7 @@ class WelcomeMultiStep extends React.Component {
                 <div>
                   <Indicator 
                     currentStep="third"
+                    deviceType={deviceType}
                     />
                   <br />
                   <ThirdStep
