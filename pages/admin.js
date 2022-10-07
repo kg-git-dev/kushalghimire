@@ -5,19 +5,19 @@ import { Form, Button } from 'semantic-ui-react';
 
 
 class Admin extends Component {
-  // static async getInitialProps(props) {
+  static async getInitialProps(props) {
 
-  //   const campaigns = await compileDonation.methods.owner().call();
-  //   const subscriberDetails = await compileDonation.methods.getSubscribersDetails().call();
-  //   const firstSubscriber = await compileDonation.methods.subscribers(0).call();
+    // const campaigns = await compileDonation.methods.owner().call();
+    const subscriberDetails = await compileDonation.methods.getSubscribersDetails().call();
+    // const firstSubscriber = await compileDonation.methods.subscribers(0).call();
 
-  //   return {
-  //     balance: web3.utils.fromWei(subscriberDetails[0], "ether"),
-  //     subscriberCount: subscriberDetails[1],
-  //     campaigns,
-  //     firstSubscriber
-  //   };
-  // }
+    return {
+      balance: web3.utils.fromWei(subscriberDetails[0], "ether"),
+      subscriberCount: subscriberDetails[1],
+      // campaigns,
+      // firstSubscriber
+    };
+  }
 
   addBalance = async (e) => {
     e.preventDefault();
@@ -31,7 +31,7 @@ class Admin extends Component {
     const tx = {
       from: signer.address,
       to: contractAddress,
-      value: web3.utils.toWei("0.007"),
+      value: web3.utils.toWei("0.1"),
     };
     // Assigning the right amount of gas
     tx.gas = await web3.eth.estimateGas(tx);
@@ -48,21 +48,16 @@ class Admin extends Component {
   }
 
   render() {
-    // const {
-    //   campaigns,
-    //   balance,
-    //   subscriberCount,
-    //   firstSubscriber
-      
-    // } = this.props;
+    const {
+      balance,
+      subscriberCount,  
+    } = this.props;
     return (
       <div>
-        {/* <div>
-          Owner: {campaigns}<br />
+        <div>
           Total Balance: {balance}<br />
           subscriberCount: {subscriberCount}<br/>
-          Subscriber Detail: {firstSubscriber}
-        </div> */}
+        </div>
         <div>
           <Form>
             <Button onClick={this.addBalance}>Add Balance</Button>
